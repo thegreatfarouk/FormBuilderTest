@@ -1,0 +1,3370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Builder v4</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f26;
+            --bg-tertiary: #242b33;
+            --bg-hover: #2d353f;
+            --border-color: #3d4654;
+            --text-primary: #e7eaed;
+            --text-secondary: #8b929a;
+            --text-muted: #6b7280;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #60a5fa;
+            --accent-success: #22c55e;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --accent-purple: #8b5cf6;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --font-mono: 'Consolas', 'Monaco', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .breadcrumb span {
+            cursor: pointer;
+        }
+
+        .breadcrumb span:hover {
+            color: var(--accent-primary);
+        }
+
+        .breadcrumb .separator {
+            color: var(--text-muted);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-secondary);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .btn-danger {
+            background: var(--accent-danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: var(--accent-success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .form-checkbox input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-primary);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .home-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 200px);
+            gap: 32px;
+        }
+
+        .home-title {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .home-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .home-actions {
+            display: flex;
+            gap: 24px;
+        }
+
+        .home-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 40px 48px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .home-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .home-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .home-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .pages-list {
+            display: grid;
+            gap: 12px;
+            max-width: 500px;
+        }
+
+        .page-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-item span {
+            font-size: 15px;
+        }
+
+        .page-badge {
+            font-size: 12px;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .data-models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .model-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .model-card:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .model-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .model-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .model-card-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .designer-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            gap: 20px;
+            height: calc(100vh - 140px);
+        }
+
+        .designer-sidebar {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .table-list-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .table-list-item:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .table-list-item.active {
+            border-color: var(--accent-primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .table-list-item.junction {
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        .table-list-item h4 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .table-list-item p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .designer-canvas {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-toolbar {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .er-canvas {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: auto;
+            padding: 60px 20px 20px;
+        }
+
+        .er-table {
+            position: absolute;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            min-width: 200px;
+            cursor: move;
+            user-select: none;
+        }
+
+        .er-table.junction {
+            border-color: var(--accent-purple);
+        }
+
+        .er-table.selected {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+
+        .er-table-header {
+            background: var(--bg-hover);
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .er-table.junction .er-table-header {
+            background: rgba(139, 92, 246, 0.15);
+        }
+
+        .junction-badge {
+            font-size: 10px;
+            background: var(--accent-purple);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .er-table-fields {
+            padding: 8px 0;
+        }
+
+        .er-field {
+            padding: 6px 14px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .er-field-name {
+            flex: 1;
+        }
+
+        .er-field-type {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .er-field-pk {
+            color: var(--accent-warning);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .er-field-fk {
+            color: var(--accent-purple);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .er-field-required {
+            color: var(--accent-danger);
+            font-size: 10px;
+        }
+
+        .relationship-line {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .designer-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-tab {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .panel-tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .panel-tab.active {
+            color: var(--accent-primary);
+            background: var(--bg-tertiary);
+            border-bottom: 2px solid var(--accent-primary);
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .field-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 12px;
+        }
+
+        .field-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .field-item-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .field-item-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .field-item-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .relationship-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .relationship-visual {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .relationship-table {
+            background: var(--bg-hover);
+            padding: 6px 12px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .relationship-arrow {
+            color: var(--accent-primary);
+            font-size: 16px;
+        }
+
+        .relationship-type {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .sql-preview {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .sql-keyword {
+            color: var(--accent-primary);
+        }
+
+        .sql-string {
+            color: var(--accent-success);
+        }
+
+        .sql-type {
+            color: var(--accent-warning);
+        }
+
+        .data-entry-modes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .mode-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .mode-card:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .mode-card.selected {
+            border-color: var(--accent-primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .mode-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .mode-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .table-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .table-chip {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .table-chip:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .table-chip.selected {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        .data-form {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .form-section-header {
+            padding: 16px 20px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-section-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .form-section-body {
+            padding: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .repeatable-section {
+            border: 1px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .repeatable-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .repeatable-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .data-flow-viz {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .flow-step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .flow-step-content {
+            flex: 1;
+        }
+
+        .flow-step-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .flow-step-data {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+        }
+
+        .flow-arrow {
+            display: flex;
+            justify-content: center;
+            padding: 8px 0;
+            color: var(--accent-primary);
+            font-size: 20px;
+        }
+
+        .report-builder {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: calc(100vh - 140px);
+        }
+
+        .report-config {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .report-preview {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .field-selector {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .field-option {
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        .field-option:last-child {
+            border-bottom: none;
+        }
+
+        .field-option:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .field-option input {
+            accent-color: var(--accent-primary);
+        }
+
+        .field-option .table-name {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .chart-container {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-container canvas {
+            max-height: 300px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .data-table tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .filter-builder {
+            margin-top: 16px;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 120px 1fr auto;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .filter-row select,
+        .filter-row input {
+            padding: 8px 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        .aggregation-options {
+            margin-top: 12px;
+        }
+
+        .agg-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            margin-bottom: 6px;
+        }
+
+        .agg-field {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        .tab-group {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-tertiary);
+            padding: 4px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: var(--bg-secondary);
+            color: var(--accent-primary);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .inline-form {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .inline-form .form-group {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--accent-secondary);
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--accent-success);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--accent-warning);
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 16px 0;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--bg-hover);
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .tag-purple {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--accent-purple);
+        }
+
+        .scrollable {
+            overflow-y: auto;
+        }
+
+        @media (max-width: 1200px) {
+            .designer-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .report-builder {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container" id="app">
+        <!-- Content will be rendered by JavaScript -->
+    </div>
+
+    <script>
+        // ============================================
+        // DATA STORE
+        // ============================================
+        const Store = {
+            dataModels: [],
+            currentModel: null,
+            selectedTable: null,
+            enteredData: {},
+            currentScreen: 'home',
+            entryMode: null,
+            selectedTables: [],
+            reportConfig: {
+                selectedFields: [],
+                aggregations: {},
+                filters: [],
+                chartType: 'bar',
+                showChart: true,
+                showStats: true,
+                showTable: true
+            }
+        };
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function generateId() {
+            return 'id_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function generateNumericId() {
+            return Math.floor(Math.random() * 900000) + 100000;
+        }
+
+        function deepClone(obj) {
+            return JSON.parse(JSON.stringify(obj));
+        }
+
+        // ============================================
+        // INITIALIZE DEMO DATA
+        // ============================================
+        function createDemoModel() {
+            const model = {
+                id: generateId(),
+                name: 'E-Commerce Demo',
+                description: 'Sample e-commerce data model with customers, orders, and products',
+                tables: [],
+                relationships: []
+            };
+
+            // Customers table
+            const customersTable = {
+                id: generateId(),
+                name: 'Customers',
+                isJunction: false,
+                position: { x: 50, y: 50 },
+                fields: [
+                    { id: generateId(), name: 'Customer ID', type: 'Number', isPrimaryKey: true, isRequired: true, isUnique: true },
+                    { id: generateId(), name: 'Full Name', type: 'Text', isPrimaryKey: false, isRequired: true, isUnique: false },
+                    { id: generateId(), name: 'Email', type: 'Email', isPrimaryKey: false, isRequired: true, isUnique: true },
+                    { id: generateId(), name: 'Phone', type: 'Text', isPrimaryKey: false, isRequired: false, isUnique: false },
+                    { id: generateId(), name: 'Registration Date', type: 'Date', isPrimaryKey: false, isRequired: true, isUnique: false }
+                ]
+            };
+
+            // Products table
+            const productsTable = {
+                id: generateId(),
+                name: 'Products',
+                isJunction: false,
+                position: { x: 450, y: 50 },
+                fields: [
+                    { id: generateId(), name: 'Product ID', type: 'Number', isPrimaryKey: true, isRequired: true, isUnique: true },
+                    { id: generateId(), name: 'Product Name', type: 'Text', isPrimaryKey: false, isRequired: true, isUnique: false },
+                    { id: generateId(), name: 'Description', type: 'Long Text', isPrimaryKey: false, isRequired: false, isUnique: false },
+                    { id: generateId(), name: 'Price', type: 'Decimal', isPrimaryKey: false, isRequired: true, isUnique: false },
+                    { id: generateId(), name: 'Stock Quantity', type: 'Number', isPrimaryKey: false, isRequired: true, isUnique: false },
+                    { id: generateId(), name: 'Active', type: 'Boolean', isPrimaryKey: false, isRequired: true, isUnique: false }
+                ]
+            };
+
+            // Orders table
+            const ordersTable = {
+                id: generateId(),
+                name: 'Orders',
+                isJunction: false,
+                position: { x: 50, y: 280 },
+                fields: [
+                    { id: generateId(), name: 'Order ID', type: 'Number', isPrimaryKey: true, isRequired: true, isUnique: true },
+                    { id: generateId(), name: 'Order Date', type: 'Date', isPrimaryKey: false, isRequired: true, isUnique: false },
+                    { id: generateId(), name: 'Total Amount', type: 'Decimal', isPrimaryKey: false, isRequired: true, isUnique: false },
+                    { id: generateId(), name: 'Status', type: 'Text', isPrimaryKey: false, isRequired: true, isUnique: false }
+                ]
+            };
+
+            // Orders_Products junction table
+            const orderProductsTable = {
+                id: generateId(),
+                name: 'Orders_Products',
+                isJunction: true,
+                position: { x: 280, y: 280 },
+                fields: [
+                    { id: generateId(), name: 'Line Item ID', type: 'Number', isPrimaryKey: true, isRequired: true, isUnique: true },
+                    { id: generateId(), name: 'Quantity', type: 'Number', isPrimaryKey: false, isRequired: true, isUnique: false },
+                    { id: generateId(), name: 'Unit Price', type: 'Decimal', isPrimaryKey: false, isRequired: true, isUnique: false },
+                    { id: generateId(), name: 'Discount', type: 'Decimal', isPrimaryKey: false, isRequired: false, isUnique: false }
+                ]
+            };
+
+            model.tables = [customersTable, productsTable, ordersTable, orderProductsTable];
+
+            // Relationships
+            model.relationships = [
+                {
+                    id: generateId(),
+                    fromTable: customersTable.id,
+                    toTable: ordersTable.id,
+                    type: 'one-to-many',
+                    fromField: customersTable.fields[0].id,
+                    toField: null
+                },
+                {
+                    id: generateId(),
+                    fromTable: ordersTable.id,
+                    toTable: orderProductsTable.id,
+                    type: 'one-to-many',
+                    fromField: ordersTable.fields[0].id,
+                    toField: null
+                },
+                {
+                    id: generateId(),
+                    fromTable: productsTable.id,
+                    toTable: orderProductsTable.id,
+                    type: 'one-to-many',
+                    fromField: productsTable.fields[0].id,
+                    toField: null
+                }
+            ];
+
+            return model;
+        }
+
+        function createDemoData() {
+            const model = Store.currentModel;
+            if (!model) return;
+
+            const customersTable = model.tables.find(t => t.name === 'Customers');
+            const productsTable = model.tables.find(t => t.name === 'Products');
+            const ordersTable = model.tables.find(t => t.name === 'Orders');
+            const orderProductsTable = model.tables.find(t => t.name === 'Orders_Products');
+
+            // Sample Customers
+            Store.enteredData[customersTable.id] = [
+                { 'Customer ID': 1001, 'Full Name': 'John Smith', 'Email': 'john.smith@email.com', 'Phone': '+1-555-0101', 'Registration Date': '2024-01-15' },
+                { 'Customer ID': 1002, 'Full Name': 'Sarah Johnson', 'Email': 'sarah.j@email.com', 'Phone': '+1-555-0102', 'Registration Date': '2024-02-20' },
+                { 'Customer ID': 1003, 'Full Name': 'Michael Brown', 'Email': 'mbrown@email.com', 'Phone': '+1-555-0103', 'Registration Date': '2024-03-10' },
+                { 'Customer ID': 1004, 'Full Name': 'Emily Davis', 'Email': 'emily.d@email.com', 'Phone': '', 'Registration Date': '2024-03-25' },
+                { 'Customer ID': 1005, 'Full Name': 'Robert Wilson', 'Email': 'rwilson@email.com', 'Phone': '+1-555-0105', 'Registration Date': '2024-04-05' }
+            ];
+
+            // Sample Products
+            Store.enteredData[productsTable.id] = [
+                { 'Product ID': 2001, 'Product Name': 'Wireless Headphones', 'Description': 'Premium noise-canceling headphones', 'Price': 149.99, 'Stock Quantity': 50, 'Active': true },
+                { 'Product ID': 2002, 'Product Name': 'USB-C Cable', 'Description': 'High-speed charging cable 2m', 'Price': 19.99, 'Stock Quantity': 200, 'Active': true },
+                { 'Product ID': 2003, 'Product Name': 'Laptop Stand', 'Description': 'Adjustable aluminum stand', 'Price': 79.99, 'Stock Quantity': 30, 'Active': true },
+                { 'Product ID': 2004, 'Product Name': 'Wireless Mouse', 'Description': 'Ergonomic wireless mouse', 'Price': 39.99, 'Stock Quantity': 75, 'Active': true },
+                { 'Product ID': 2005, 'Product Name': 'Webcam HD', 'Description': '1080p webcam with microphone', 'Price': 89.99, 'Stock Quantity': 25, 'Active': true },
+                { 'Product ID': 2006, 'Product Name': 'Mechanical Keyboard', 'Description': 'RGB mechanical gaming keyboard', 'Price': 129.99, 'Stock Quantity': 0, 'Active': false }
+            ];
+
+            // Sample Orders
+            Store.enteredData[ordersTable.id] = [
+                { 'Order ID': 3001, 'Customer ID': 1001, 'Order Date': '2024-06-01', 'Total Amount': 189.98, 'Status': 'Completed' },
+                { 'Order ID': 3002, 'Customer ID': 1002, 'Order Date': '2024-06-05', 'Total Amount': 149.99, 'Status': 'Completed' },
+                { 'Order ID': 3003, 'Customer ID': 1001, 'Order Date': '2024-06-10', 'Total Amount': 259.97, 'Status': 'Completed' },
+                { 'Order ID': 3004, 'Customer ID': 1003, 'Order Date': '2024-06-15', 'Total Amount': 79.99, 'Status': 'Shipped' },
+                { 'Order ID': 3005, 'Customer ID': 1004, 'Order Date': '2024-06-20', 'Total Amount': 169.98, 'Status': 'Processing' },
+                { 'Order ID': 3006, 'Customer ID': 1002, 'Order Date': '2024-06-22', 'Total Amount': 219.98, 'Status': 'Pending' },
+                { 'Order ID': 3007, 'Customer ID': 1005, 'Order Date': '2024-06-25', 'Total Amount': 89.99, 'Status': 'Completed' }
+            ];
+
+            // Sample Order Products (junction)
+            Store.enteredData[orderProductsTable.id] = [
+                { 'Line Item ID': 4001, 'Order ID': 3001, 'Product ID': 2001, 'Quantity': 1, 'Unit Price': 149.99, 'Discount': 0 },
+                { 'Line Item ID': 4002, 'Order ID': 3001, 'Product ID': 2002, 'Quantity': 2, 'Unit Price': 19.99, 'Discount': 0 },
+                { 'Line Item ID': 4003, 'Order ID': 3002, 'Product ID': 2001, 'Quantity': 1, 'Unit Price': 149.99, 'Discount': 0 },
+                { 'Line Item ID': 4004, 'Order ID': 3003, 'Product ID': 2003, 'Quantity': 1, 'Unit Price': 79.99, 'Discount': 0 },
+                { 'Line Item ID': 4005, 'Order ID': 3003, 'Product ID': 2004, 'Quantity': 2, 'Unit Price': 39.99, 'Discount': 5 },
+                { 'Line Item ID': 4006, 'Order ID': 3003, 'Product ID': 2005, 'Quantity': 1, 'Unit Price': 89.99, 'Discount': 10 },
+                { 'Line Item ID': 4007, 'Order ID': 3004, 'Product ID': 2003, 'Quantity': 1, 'Unit Price': 79.99, 'Discount': 0 },
+                { 'Line Item ID': 4008, 'Order ID': 3005, 'Product ID': 2001, 'Quantity': 1, 'Unit Price': 149.99, 'Discount': 0 },
+                { 'Line Item ID': 4009, 'Order ID': 3005, 'Product ID': 2002, 'Quantity': 1, 'Unit Price': 19.99, 'Discount': 0 },
+                { 'Line Item ID': 4010, 'Order ID': 3006, 'Product ID': 2006, 'Quantity': 1, 'Unit Price': 129.99, 'Discount': 0 },
+                { 'Line Item ID': 4011, 'Order ID': 3006, 'Product ID': 2005, 'Quantity': 1, 'Unit Price': 89.99, 'Discount': 0 },
+                { 'Line Item ID': 4012, 'Order ID': 3007, 'Product ID': 2005, 'Quantity': 1, 'Unit Price': 89.99, 'Discount': 0 }
+            ];
+        }
+
+        // ============================================
+        // SQL GENERATOR
+        // ============================================
+        function getFieldTypeSQL(type) {
+            const mapping = {
+                'Text': 'VARCHAR(255)',
+                'Long Text': 'TEXT',
+                'Number': 'INT',
+                'Decimal': 'FLOAT',
+                'Email': 'VARCHAR(255)',
+                'Password': 'VARCHAR(255)',
+                'Date': 'DATE',
+                'Boolean': 'BOOLEAN'
+            };
+            return mapping[type] || 'VARCHAR(255)';
+        }
+
+        function toSnakeCase(str) {
+            return str.replace(/\s+/g, '_').toLowerCase();
+        }
+
+        function generateSQL(model) {
+            if (!model) return '';
+
+            let sql = '';
+            const tableOrder = getTableCreationOrder(model);
+
+            // Generate CREATE TABLE statements
+            tableOrder.forEach(table => {
+                sql += `CREATE TABLE ${toSnakeCase(table.name)} (\n`;
+
+                const fieldDefs = [];
+
+                // Regular fields
+                table.fields.forEach(field => {
+                    let def = `    ${toSnakeCase(field.name)} ${getFieldTypeSQL(field.type)}`;
+                    if (field.isPrimaryKey) def += ' PRIMARY KEY';
+                    else if (field.isRequired) def += ' NOT NULL';
+                    if (field.isUnique && !field.isPrimaryKey) def += ' UNIQUE';
+                    fieldDefs.push(def);
+                });
+
+                // Foreign key fields
+                const incomingRels = model.relationships.filter(r => r.toTable === table.id);
+                incomingRels.forEach(rel => {
+                    const fromTable = model.tables.find(t => t.id === rel.fromTable);
+                    if (fromTable) {
+                        const fkName = toSnakeCase(fromTable.name) + '_id';
+                        fieldDefs.push(`    ${fkName} INT NOT NULL`);
+                        fieldDefs.push(`    FOREIGN KEY (${fkName}) REFERENCES ${toSnakeCase(fromTable.name)}(${toSnakeCase(fromTable.fields.find(f => f.isPrimaryKey)?.name || 'id')})`);
+                    }
+                });
+
+                sql += fieldDefs.join(',\n');
+                sql += '\n);\n\n';
+            });
+
+            return sql;
+        }
+
+        function getTableCreationOrder(model) {
+            // Topological sort based on relationships
+            const tables = [...model.tables];
+            const visited = new Set();
+            const order = [];
+
+            function visit(table) {
+                if (visited.has(table.id)) return;
+                visited.add(table.id);
+
+                // Visit dependencies first (tables this table references)
+                const deps = model.relationships
+                    .filter(r => r.toTable === table.id)
+                    .map(r => model.tables.find(t => t.id === r.fromTable))
+                    .filter(Boolean);
+
+                deps.forEach(visit);
+                order.push(table);
+            }
+
+            tables.forEach(visit);
+            return order;
+        }
+
+        // ============================================
+        // RENDER FUNCTIONS
+        // ============================================
+        function render() {
+            const app = document.getElementById('app');
+            
+            switch (Store.currentScreen) {
+                case 'home':
+                    app.innerHTML = renderHomeScreen();
+                    break;
+                case 'pages':
+                    app.innerHTML = renderPagesScreen();
+                    break;
+                case 'data-models':
+                    app.innerHTML = renderDataModelsScreen();
+                    break;
+                case 'designer':
+                    app.innerHTML = renderDesignerScreen();
+                    initERDiagram();
+                    break;
+                case 'data-entry':
+                    app.innerHTML = renderDataEntryScreen();
+                    break;
+                case 'data-entry-form':
+                    app.innerHTML = renderDataEntryFormScreen();
+                    break;
+                case 'reports':
+                    app.innerHTML = renderReportsScreen();
+                    initCharts();
+                    break;
+            }
+        }
+
+        function renderHeader(breadcrumbs = []) {
+            return `
+                <header class="header">
+                    <div class="breadcrumb">
+                        <span onclick="navigateTo('home')">Form Builder v4</span>
+                        ${breadcrumbs.map(b => `
+                            <span class="separator">/</span>
+                            <span onclick="${b.action}">${b.label}</span>
+                        `).join('')}
+                    </div>
+                    <div class="header-nav">
+                        ${Store.currentModel ? `
+                            <button class="btn btn-secondary btn-sm" onclick="navigateTo('data-entry')">Data Entry</button>
+                            <button class="btn btn-secondary btn-sm" onclick="navigateTo('reports')">Reports</button>
+                        ` : ''}
+                    </div>
+                </header>
+            `;
+        }
+
+        function renderHomeScreen() {
+            return `
+                ${renderHeader()}
+                <main class="main-content">
+                    <div class="home-screen">
+                        <h1 class="home-title">Form Builder v4</h1>
+                        <p class="home-subtitle">A no-code database designer, data entry simulator, and reporting engine for non-technical users.</p>
+                        <div class="home-actions">
+                            <div class="home-card" onclick="navigateTo('pages')">
+                                <h3>Pages</h3>
+                                <p>View application pages</p>
+                            </div>
+                            <div class="home-card" onclick="navigateTo('data-models')">
+                                <h3>Data Models</h3>
+                                <p>Design relational databases</p>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            `;
+        }
+
+        function renderPagesScreen() {
+            const pages = [
+                { name: 'Home', type: 'Public' },
+                { name: 'Login', type: 'Authentication' },
+                { name: 'Registration', type: 'Authentication' },
+                { name: 'Profile', type: 'Protected' },
+                { name: 'Dashboard', type: 'Protected' }
+            ];
+
+            return `
+                ${renderHeader([{ label: 'Pages', action: "navigateTo('pages')" }])}
+                <main class="main-content">
+                    <h2 style="margin-bottom: 24px;">Application Pages</h2>
+                    <div class="pages-list">
+                        ${pages.map(p => `
+                            <div class="page-item">
+                                <span>${p.name}</span>
+                                <span class="page-badge">${p.type}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </main>
+            `;
+        }
+
+        function renderDataModelsScreen() {
+            return `
+                ${renderHeader([{ label: 'Data Models', action: "navigateTo('data-models')" }])}
+                <main class="main-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2>Data Models</h2>
+                        <button class="btn btn-primary" onclick="createNewModel()">Create Data Model</button>
+                    </div>
+                    <div class="data-models-grid">
+                        ${Store.dataModels.map(model => `
+                            <div class="model-card" onclick="openModel('${model.id}')">
+                                <h3>${model.name}</h3>
+                                <p>${model.description || 'No description'}</p>
+                                <div class="model-card-meta">
+                                    <span>${model.tables.length} tables</span>
+                                    <span>${model.relationships.length} relationships</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </main>
+            `;
+        }
+
+        function renderDesignerScreen() {
+            const model = Store.currentModel;
+            if (!model) return '';
+
+            return `
+                ${renderHeader([
+                    { label: 'Data Models', action: "navigateTo('data-models')" },
+                    { label: model.name, action: "" }
+                ])}
+                <main class="main-content">
+                    <div class="designer-layout">
+                        ${renderTablesSidebar()}
+                        ${renderERCanvas()}
+                        ${renderPropertiesPanel()}
+                    </div>
+                </main>
+                ${renderModals()}
+            `;
+        }
+
+        function renderTablesSidebar() {
+            const model = Store.currentModel;
+            return `
+                <aside class="designer-sidebar">
+                    <div class="sidebar-header">
+                        <span class="sidebar-title">Tables</span>
+                        <button class="btn btn-primary btn-sm" onclick="showAddTableModal()">Add Table</button>
+                    </div>
+                    <div class="sidebar-content">
+                        ${model.tables.length === 0 ? `
+                            <div class="empty-state">
+                                <p>No tables yet. Add your first table to get started.</p>
+                            </div>
+                        ` : model.tables.map(table => `
+                            <div class="table-list-item ${table.isJunction ? 'junction' : ''} ${Store.selectedTable?.id === table.id ? 'active' : ''}" 
+                                 onclick="selectTable('${table.id}')">
+                                <h4>${table.name} ${table.isJunction ? '<span class="tag tag-purple">Junction</span>' : ''}</h4>
+                                <p>${table.fields.length} fields</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </aside>
+            `;
+        }
+
+        function renderERCanvas() {
+            return `
+                <div class="designer-canvas">
+                    <div class="canvas-toolbar">
+                        <button class="btn btn-secondary btn-sm" onclick="showAddRelationshipModal()">Add Relationship</button>
+                        <button class="btn btn-secondary btn-sm" onclick="showSQLPreviewModal()">View SQL</button>
+                    </div>
+                    <div class="er-canvas" id="erCanvas">
+                        <!-- ER diagram will be rendered here -->
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPropertiesPanel() {
+            const table = Store.selectedTable;
+
+            return `
+                <aside class="designer-panel">
+                    <div class="panel-tabs">
+                        <button class="panel-tab active" data-tab="fields" onclick="switchPanelTab('fields')">Fields</button>
+                        <button class="panel-tab" data-tab="relationships" onclick="switchPanelTab('relationships')">Relationships</button>
+                    </div>
+                    <div class="panel-content" id="panelContent">
+                        ${table ? renderFieldsPanel(table) : `
+                            <div class="empty-state">
+                                <p>Select a table to view its properties</p>
+                            </div>
+                        `}
+                    </div>
+                </aside>
+            `;
+        }
+
+        function renderFieldsPanel(table) {
+            return `
+                <div class="inline-form" style="margin-bottom: 16px;">
+                    <input type="text" class="form-input" id="tableNameInput" value="${table.name}" 
+                           onchange="updateTableName('${table.id}', this.value)">
+                    <button class="btn btn-danger btn-sm" onclick="deleteTable('${table.id}')">Delete</button>
+                </div>
+                <div class="form-checkbox" style="margin-bottom: 16px;">
+                    <input type="checkbox" id="isJunctionCheck" ${table.isJunction ? 'checked' : ''} 
+                           onchange="toggleJunction('${table.id}', this.checked)">
+                    <label for="isJunctionCheck">Junction Table</label>
+                </div>
+                <div class="divider"></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span class="section-title" style="margin-bottom: 0;">Fields</span>
+                    <button class="btn btn-secondary btn-sm" onclick="showAddFieldModal('${table.id}')">Add Field</button>
+                </div>
+                <div class="field-list">
+                    ${table.fields.map(field => `
+                        <div class="field-item">
+                            <div class="field-item-header">
+                                <span class="field-item-name">${field.name}</span>
+                                <div class="field-item-actions">
+                                    <button class="btn btn-secondary btn-sm btn-icon" onclick="showEditFieldModal('${table.id}', '${field.id}')">E</button>
+                                    <button class="btn btn-danger btn-sm btn-icon" onclick="deleteField('${table.id}', '${field.id}')">X</button>
+                                </div>
+                            </div>
+                            <div class="field-item-meta">
+                                <span>${field.type}</span>
+                                ${field.isPrimaryKey ? '<span style="color: var(--accent-warning)">Unique ID</span>' : ''}
+                                ${field.isRequired ? '<span style="color: var(--accent-danger)">Required</span>' : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderRelationshipsPanel() {
+            const model = Store.currentModel;
+            return `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span class="section-title" style="margin-bottom: 0;">Relationships</span>
+                    <button class="btn btn-secondary btn-sm" onclick="showAddRelationshipModal()">Add</button>
+                </div>
+                ${model.relationships.length === 0 ? `
+                    <div class="empty-state">
+                        <p>No relationships defined</p>
+                    </div>
+                ` : model.relationships.map(rel => {
+                    const fromTable = model.tables.find(t => t.id === rel.fromTable);
+                    const toTable = model.tables.find(t => t.id === rel.toTable);
+                    const typeLabel = rel.type === 'one-to-one' ? 'One matches One' : 
+                                     rel.type === 'one-to-many' ? 'One matches Many' : 'Many match Many';
+                    return `
+                        <div class="relationship-item">
+                            <div class="relationship-visual">
+                                <span class="relationship-table">${fromTable?.name || 'Unknown'}</span>
+                                <span class="relationship-arrow">→</span>
+                                <span class="relationship-table">${toTable?.name || 'Unknown'}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="relationship-type">${typeLabel}</span>
+                                <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRelationship('${rel.id}')">X</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            `;
+        }
+
+        function renderModals() {
+            return `
+                <div id="modalContainer"></div>
+            `;
+        }
+
+        // ============================================
+        // DATA ENTRY SCREENS
+        // ============================================
+        function renderDataEntryScreen() {
+            const model = Store.currentModel;
+            if (!model) return '';
+
+            return `
+                ${renderHeader([
+                    { label: 'Data Models', action: "navigateTo('data-models')" },
+                    { label: model.name, action: "navigateTo('designer')" },
+                    { label: 'Data Entry', action: "" }
+                ])}
+                <main class="main-content">
+                    <h2 style="text-align: center; margin-bottom: 16px;">Select Entry Mode</h2>
+                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 32px;">Choose how you want to enter data into the system</p>
+                    
+                    <div class="data-entry-modes">
+                        <div class="mode-card ${Store.entryMode === 'single' ? 'selected' : ''}" onclick="selectEntryMode('single')">
+                            <h3>Single Table Entry</h3>
+                            <p>Enter data into one table at a time. No relationship enforcement.</p>
+                        </div>
+                        <div class="mode-card ${Store.entryMode === 'multi' ? 'selected' : ''}" onclick="selectEntryMode('multi')">
+                            <h3>Multi-Table Entry</h3>
+                            <p>Enter data into multiple related tables. Relationships enforced between selected tables.</p>
+                        </div>
+                        <div class="mode-card ${Store.entryMode === 'flow' ? 'selected' : ''}" onclick="selectEntryMode('flow')">
+                            <h3>Full Relational Flow</h3>
+                            <p>Enter data following the complete relationship chain. All parent tables included.</p>
+                        </div>
+                    </div>
+
+                    ${Store.entryMode ? renderTableSelection() : ''}
+                </main>
+            `;
+        }
+
+        function renderTableSelection() {
+            const model = Store.currentModel;
+            
+            if (Store.entryMode === 'flow') {
+                // For flow mode, auto-select based on hierarchy
+                return `
+                    <div style="max-width: 600px; margin: 32px auto; text-align: center;">
+                        <h3 style="margin-bottom: 16px;">Full Relational Flow</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                            Data will be entered following the complete relationship chain.
+                            All tables will be included automatically.
+                        </p>
+                        <button class="btn btn-primary" onclick="startDataEntry()">Start Entry</button>
+                    </div>
+                `;
+            }
+
+            return `
+                <div style="max-width: 600px; margin: 32px auto;">
+                    <h3 style="margin-bottom: 16px; text-align: center;">Select Tables</h3>
+                    <div class="table-selector" style="justify-content: center;">
+                        ${model.tables.map(table => `
+                            <span class="table-chip ${Store.selectedTables.includes(table.id) ? 'selected' : ''}" 
+                                  onclick="toggleTableSelection('${table.id}')">
+                                ${table.name}
+                                ${table.isJunction ? ' (Junction)' : ''}
+                            </span>
+                        `).join('')}
+                    </div>
+                    ${Store.selectedTables.length > 0 ? `
+                        <div style="text-align: center; margin-top: 24px;">
+                            <button class="btn btn-primary" onclick="startDataEntry()">Continue</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderDataEntryFormScreen() {
+            const model = Store.currentModel;
+            if (!model) return '';
+
+            const tablesToShow = getEntryTables();
+
+            return `
+                ${renderHeader([
+                    { label: 'Data Models', action: "navigateTo('data-models')" },
+                    { label: model.name, action: "navigateTo('designer')" },
+                    { label: 'Data Entry', action: "navigateTo('data-entry')" },
+                    { label: 'Form', action: "" }
+                ])}
+                <main class="main-content">
+                    <form class="data-form" id="dataEntryForm" onsubmit="submitDataEntry(event)">
+                        ${renderDataFormSections(tablesToShow)}
+                        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 24px;">
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('data-entry')">Cancel</button>
+                            <button type="submit" class="btn btn-success">Submit Data</button>
+                        </div>
+                    </form>
+                    <div id="dataFlowViz"></div>
+                </main>
+            `;
+        }
+
+        function getEntryTables() {
+            const model = Store.currentModel;
+            
+            if (Store.entryMode === 'flow') {
+                return getTableCreationOrder(model);
+            }
+            
+            return Store.selectedTables.map(id => model.tables.find(t => t.id === id)).filter(Boolean);
+        }
+
+        function renderDataFormSections(tables) {
+            const model = Store.currentModel;
+            let html = '';
+
+            tables.forEach((table, index) => {
+                const isRepeatable = isTableRepeatable(table.id);
+                const parentTable = getParentTable(table.id);
+
+                html += `
+                    <div class="form-section" data-table-id="${table.id}">
+                        <div class="form-section-header">
+                            <span class="form-section-title">${table.name}</span>
+                            ${table.isJunction ? '<span class="tag tag-purple">Junction Table</span>' : ''}
+                        </div>
+                        <div class="form-section-body">
+                            ${isRepeatable ? `
+                                <div id="repeatable-${table.id}">
+                                    ${renderRepeatableRow(table, 0)}
+                                </div>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="addRepeatableRow('${table.id}')">
+                                    Add Another ${table.name} Entry
+                                </button>
+                            ` : renderFormFields(table)}
+                        </div>
+                    </div>
+                `;
+            });
+
+            return html;
+        }
+
+        function renderFormFields(table, rowIndex = null) {
+            const prefix = rowIndex !== null ? `${table.id}_${rowIndex}_` : `${table.id}_`;
+            
+            return `
+                <div class="form-row">
+                    ${table.fields.filter(f => !f.isPrimaryKey).map(field => `
+                        <div class="form-group">
+                            <label class="form-label">${field.name}${field.isRequired ? ' *' : ''}</label>
+                            ${renderFieldInput(field, prefix)}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderRepeatableRow(table, index) {
+            return `
+                <div class="repeatable-section" data-row-index="${index}">
+                    <div class="repeatable-header">
+                        <span class="repeatable-title">Entry ${index + 1}</span>
+                        ${index > 0 ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeRepeatableRow('${table.id}', ${index})">Remove</button>` : ''}
+                    </div>
+                    ${renderFormFields(table, index)}
+                </div>
+            `;
+        }
+
+        function renderFieldInput(field, prefix) {
+            const name = prefix + field.id;
+            const required = field.isRequired ? 'required' : '';
+
+            switch (field.type) {
+                case 'Long Text':
+                    return `<textarea class="form-textarea" name="${name}" ${required}></textarea>`;
+                case 'Number':
+                    return `<input type="number" class="form-input" name="${name}" ${required}>`;
+                case 'Decimal':
+                    return `<input type="number" step="0.01" class="form-input" name="${name}" ${required}>`;
+                case 'Email':
+                    return `<input type="email" class="form-input" name="${name}" ${required}>`;
+                case 'Password':
+                    return `<input type="password" class="form-input" name="${name}" ${required}>`;
+                case 'Date':
+                    return `<input type="date" class="form-input" name="${name}" ${required}>`;
+                case 'Boolean':
+                    return `
+                        <select class="form-select" name="${name}" ${required}>
+                            <option value="">Select...</option>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    `;
+                default:
+                    return `<input type="text" class="form-input" name="${name}" ${required}>`;
+            }
+        }
+
+        function isTableRepeatable(tableId) {
+            const model = Store.currentModel;
+            // A table is repeatable if it's on the "many" side of a 1:N relationship
+            return model.relationships.some(r => r.toTable === tableId && r.type === 'one-to-many');
+        }
+
+        function getParentTable(tableId) {
+            const model = Store.currentModel;
+            const rel = model.relationships.find(r => r.toTable === tableId);
+            return rel ? model.tables.find(t => t.id === rel.fromTable) : null;
+        }
+
+        // ============================================
+        // REPORTS SCREEN
+        // ============================================
+        function renderReportsScreen() {
+            const model = Store.currentModel;
+            if (!model) return '';
+
+            return `
+                ${renderHeader([
+                    { label: 'Data Models', action: "navigateTo('data-models')" },
+                    { label: model.name, action: "navigateTo('designer')" },
+                    { label: 'Reports', action: "" }
+                ])}
+                <main class="main-content">
+                    <div class="report-builder">
+                        ${renderReportConfig()}
+                        ${renderReportPreview()}
+                    </div>
+                </main>
+            `;
+        }
+
+        function renderReportConfig() {
+            const model = Store.currentModel;
+
+            return `
+                <aside class="report-config">
+                    <div class="sidebar-header">
+                        <span class="sidebar-title">Report Configuration</span>
+                    </div>
+                    <div class="sidebar-content scrollable">
+                        <div class="form-group">
+                            <label class="form-label">Select Fields</label>
+                            <div class="field-selector">
+                                ${model.tables.map(table => 
+                                    table.fields.map(field => `
+                                        <label class="field-option">
+                                            <input type="checkbox" 
+                                                   ${Store.reportConfig.selectedFields.includes(`${table.id}.${field.id}`) ? 'checked' : ''}
+                                                   onchange="toggleReportField('${table.id}', '${field.id}')">
+                                            <span>${field.name}</span>
+                                            <span class="table-name">${table.name}</span>
+                                        </label>
+                                    `).join('')
+                                ).join('')}
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="form-group">
+                            <label class="form-label">Presentation</label>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <label class="form-checkbox">
+                                    <input type="checkbox" ${Store.reportConfig.showChart ? 'checked' : ''} 
+                                           onchange="Store.reportConfig.showChart = this.checked; render();">
+                                    Show Chart
+                                </label>
+                                <label class="form-checkbox">
+                                    <input type="checkbox" ${Store.reportConfig.showStats ? 'checked' : ''} 
+                                           onchange="Store.reportConfig.showStats = this.checked; render();">
+                                    Show Statistics
+                                </label>
+                                <label class="form-checkbox">
+                                    <input type="checkbox" ${Store.reportConfig.showTable ? 'checked' : ''} 
+                                           onchange="Store.reportConfig.showTable = this.checked; render();">
+                                    Show Table
+                                </label>
+                            </div>
+                        </div>
+
+                        ${Store.reportConfig.showChart ? `
+                            <div class="form-group">
+                                <label class="form-label">Chart Type</label>
+                                <select class="form-select" onchange="Store.reportConfig.chartType = this.value; render();">
+                                    <option value="bar" ${Store.reportConfig.chartType === 'bar' ? 'selected' : ''}>Bar Chart</option>
+                                    <option value="line" ${Store.reportConfig.chartType === 'line' ? 'selected' : ''}>Line Chart</option>
+                                    <option value="doughnut" ${Store.reportConfig.chartType === 'doughnut' ? 'selected' : ''}>Donut Chart</option>
+                                </select>
+                            </div>
+                        ` : ''}
+
+                        <div class="divider"></div>
+
+                        <div class="form-group">
+                            <label class="form-label">Aggregations (Optional)</label>
+                            <div class="aggregation-options">
+                                ${getNumericSelectedFields().map(f => `
+                                    <div class="agg-row">
+                                        <span class="agg-field">${f.fieldName}</span>
+                                        <select class="form-select" style="width: 100px;" 
+                                                onchange="setAggregation('${f.key}', this.value)">
+                                            <option value="" ${!Store.reportConfig.aggregations[f.key] ? 'selected' : ''}>None</option>
+                                            <option value="count" ${Store.reportConfig.aggregations[f.key] === 'count' ? 'selected' : ''}>Count</option>
+                                            <option value="sum" ${Store.reportConfig.aggregations[f.key] === 'sum' ? 'selected' : ''}>Sum</option>
+                                            <option value="avg" ${Store.reportConfig.aggregations[f.key] === 'avg' ? 'selected' : ''}>Average</option>
+                                        </select>
+                                    </div>
+                                `).join('')}
+                                ${getNumericSelectedFields().length === 0 ? '<p style="font-size: 12px; color: var(--text-muted);">Select numeric fields to enable aggregations</p>' : ''}
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <label class="form-label" style="margin-bottom: 0;">Filters</label>
+                                <button class="btn btn-secondary btn-sm" onclick="addFilter()">Add Filter</button>
+                            </div>
+                            <div class="filter-builder" id="filterBuilder">
+                                ${Store.reportConfig.filters.map((filter, i) => renderFilterRow(filter, i)).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            `;
+        }
+
+        function renderFilterRow(filter, index) {
+            const model = Store.currentModel;
+            const allFields = [];
+            model.tables.forEach(t => {
+                t.fields.forEach(f => {
+                    allFields.push({ key: `${t.id}.${f.id}`, label: `${t.name}: ${f.name}`, type: f.type });
+                });
+            });
+
+            return `
+                <div class="filter-row">
+                    <select class="form-select" onchange="updateFilter(${index}, 'field', this.value)">
+                        <option value="">Select Field</option>
+                        ${allFields.map(f => `
+                            <option value="${f.key}" ${filter.field === f.key ? 'selected' : ''}>${f.label}</option>
+                        `).join('')}
+                    </select>
+                    <select class="form-select" onchange="updateFilter(${index}, 'operator', this.value)">
+                        <option value="eq" ${filter.operator === 'eq' ? 'selected' : ''}>Equals</option>
+                        <option value="neq" ${filter.operator === 'neq' ? 'selected' : ''}>Not Equals</option>
+                        <option value="gt" ${filter.operator === 'gt' ? 'selected' : ''}>Greater Than</option>
+                        <option value="lt" ${filter.operator === 'lt' ? 'selected' : ''}>Less Than</option>
+                        <option value="null" ${filter.operator === 'null' ? 'selected' : ''}>Is Null</option>
+                        <option value="notnull" ${filter.operator === 'notnull' ? 'selected' : ''}>Is Not Null</option>
+                    </select>
+                    <input type="text" class="form-input" value="${filter.value || ''}" 
+                           onchange="updateFilter(${index}, 'value', this.value)"
+                           ${['null', 'notnull'].includes(filter.operator) ? 'disabled' : ''}>
+                    <button class="btn btn-danger btn-sm btn-icon" onclick="removeFilter(${index})">X</button>
+                </div>
+            `;
+        }
+
+        function renderReportPreview() {
+            if (Store.reportConfig.selectedFields.length === 0) {
+                return `
+                    <div class="report-preview">
+                        <div class="empty-state">
+                            <h3>Select Fields to Generate Report</h3>
+                            <p>Choose at least one field from the configuration panel to see your report.</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const data = getReportData();
+
+            return `
+                <div class="report-preview">
+                    <h3 style="margin-bottom: 24px;">Report Preview</h3>
+                    
+                    ${Store.reportConfig.showStats ? renderStats(data) : ''}
+                    ${Store.reportConfig.showChart ? '<div class="chart-container"><canvas id="reportChart"></canvas></div>' : ''}
+                    ${Store.reportConfig.showTable ? renderDataTable(data) : ''}
+                </div>
+            `;
+        }
+
+        function renderStats(data) {
+            const stats = calculateStats(data);
+            
+            return `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${data.length}</div>
+                        <div class="stat-label">Total Records</div>
+                    </div>
+                    ${stats.map(s => `
+                        <div class="stat-card">
+                            <div class="stat-value">${s.value}</div>
+                            <div class="stat-label">${s.label}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderDataTable(data) {
+            if (data.length === 0) {
+                return '<p style="color: var(--text-muted);">No data available</p>';
+            }
+
+            const headers = Object.keys(data[0]);
+
+            return `
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                ${headers.map(h => `<th>${h}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.slice(0, 50).map(row => `
+                                <tr>
+                                    ${headers.map(h => `<td>${row[h] !== undefined && row[h] !== null ? row[h] : '-'}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    ${data.length > 50 ? `<p style="margin-top: 12px; color: var(--text-muted); font-size: 13px;">Showing 50 of ${data.length} records</p>` : ''}
+                </div>
+            `;
+        }
+
+        // ============================================
+        // ER DIAGRAM
+        // ============================================
+        function initERDiagram() {
+            const canvas = document.getElementById('erCanvas');
+            if (!canvas) return;
+
+            const model = Store.currentModel;
+            if (!model) return;
+
+            let html = '';
+
+            // Render tables
+            model.tables.forEach(table => {
+                html += renderERTable(table);
+            });
+
+            // Render relationship lines
+            html += renderRelationshipLines();
+
+            canvas.innerHTML = html;
+
+            // Make tables draggable
+            model.tables.forEach(table => {
+                const el = document.getElementById(`erTable-${table.id}`);
+                if (el) {
+                    makeDraggable(el, table);
+                }
+            });
+        }
+
+        function renderERTable(table) {
+            const model = Store.currentModel;
+            const incomingRels = model.relationships.filter(r => r.toTable === table.id);
+
+            // Get FK fields
+            const fkFields = incomingRels.map(rel => {
+                const fromTable = model.tables.find(t => t.id === rel.fromTable);
+                return fromTable ? fromTable.name + ' ID' : null;
+            }).filter(Boolean);
+
+            return `
+                <div class="er-table ${table.isJunction ? 'junction' : ''} ${Store.selectedTable?.id === table.id ? 'selected' : ''}" 
+                     id="erTable-${table.id}"
+                     style="left: ${table.position.x}px; top: ${table.position.y}px;"
+                     onclick="selectTable('${table.id}')">
+                    <div class="er-table-header">
+                        ${table.name}
+                        ${table.isJunction ? '<span class="junction-badge">Junction</span>' : ''}
+                    </div>
+                    <div class="er-table-fields">
+                        ${table.fields.map(field => `
+                            <div class="er-field">
+                                <span class="er-field-name">${field.name}</span>
+                                <span class="er-field-type">${field.type}</span>
+                                ${field.isPrimaryKey ? '<span class="er-field-pk">PK</span>' : ''}
+                                ${field.isRequired && !field.isPrimaryKey ? '<span class="er-field-required">*</span>' : ''}
+                            </div>
+                        `).join('')}
+                        ${fkFields.map(fk => `
+                            <div class="er-field">
+                                <span class="er-field-name">${fk}</span>
+                                <span class="er-field-fk">FK</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRelationshipLines() {
+            const model = Store.currentModel;
+            let svg = `<svg class="relationship-line" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible;">`;
+
+            model.relationships.forEach(rel => {
+                const fromTable = model.tables.find(t => t.id === rel.fromTable);
+                const toTable = model.tables.find(t => t.id === rel.toTable);
+
+                if (fromTable && toTable) {
+                    const fromX = fromTable.position.x + 100;
+                    const fromY = fromTable.position.y + 40;
+                    const toX = toTable.position.x + 100;
+                    const toY = toTable.position.y + 40;
+
+                    const midX = (fromX + toX) / 2;
+                    const midY = (fromY + toY) / 2;
+
+                    svg += `
+                        <path d="M ${fromX} ${fromY} Q ${midX} ${fromY} ${midX} ${midY} Q ${midX} ${toY} ${toX} ${toY}" 
+                              fill="none" stroke="var(--accent-primary)" stroke-width="2"/>
+                        <circle cx="${toX}" cy="${toY}" r="5" fill="var(--accent-primary)"/>
+                        <text x="${midX + 10}" y="${midY}" fill="var(--text-secondary)" font-size="11">
+                            ${rel.type === 'one-to-one' ? '1:1' : rel.type === 'one-to-many' ? '1:N' : 'N:M'}
+                        </text>
+                    `;
+                }
+            });
+
+            svg += '</svg>';
+            return svg;
+        }
+
+        function makeDraggable(el, table) {
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
+
+            el.addEventListener('mousedown', (e) => {
+                if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialX = table.position.x;
+                initialY = table.position.y;
+                el.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                table.position.x = Math.max(0, initialX + dx);
+                table.position.y = Math.max(0, initialY + dy);
+                el.style.left = table.position.x + 'px';
+                el.style.top = table.position.y + 'px';
+                
+                // Update relationship lines
+                const canvas = document.getElementById('erCanvas');
+                const svg = canvas.querySelector('svg');
+                if (svg) {
+                    svg.outerHTML = renderRelationshipLines();
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                el.style.cursor = 'move';
+            });
+        }
+
+        // ============================================
+        // CHART INITIALIZATION
+        // ============================================
+        let reportChart = null;
+
+        function initCharts() {
+            const canvas = document.getElementById('reportChart');
+            if (!canvas) return;
+
+            if (reportChart) {
+                reportChart.destroy();
+            }
+
+            const data = getReportData();
+            if (data.length === 0) return;
+
+            const chartData = prepareChartData(data);
+
+            reportChart = new Chart(canvas, {
+                type: Store.reportConfig.chartType,
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e7eaed'
+                            }
+                        }
+                    },
+                    scales: Store.reportConfig.chartType !== 'doughnut' ? {
+                        x: {
+                            ticks: { color: '#8b929a' },
+                            grid: { color: '#3d4654' }
+                        },
+                        y: {
+                            ticks: { color: '#8b929a' },
+                            grid: { color: '#3d4654' }
+                        }
+                    } : undefined
+                }
+            });
+        }
+
+        function prepareChartData(data) {
+            if (data.length === 0) return { labels: [], datasets: [] };
+
+            const keys = Object.keys(data[0]);
+            const labelKey = keys[0];
+            const valueKey = keys.find(k => {
+                const val = data[0][k];
+                return typeof val === 'number';
+            }) || keys[1];
+
+            const labels = data.slice(0, 10).map(d => String(d[labelKey] || ''));
+            const values = data.slice(0, 10).map(d => Number(d[valueKey]) || 0);
+
+            const colors = [
+                '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'
+            ];
+
+            return {
+                labels,
+                datasets: [{
+                    label: valueKey,
+                    data: values,
+                    backgroundColor: Store.reportConfig.chartType === 'doughnut' ? colors : colors[0],
+                    borderColor: Store.reportConfig.chartType === 'doughnut' ? colors : colors[0],
+                    borderWidth: 1
+                }]
+            };
+        }
+
+        // ============================================
+        // REPORT DATA FUNCTIONS
+        // ============================================
+        function getReportData() {
+            const model = Store.currentModel;
+            if (!model) return [];
+
+            const selectedFields = Store.reportConfig.selectedFields;
+            if (selectedFields.length === 0) return [];
+
+            // Get all data with joins
+            let result = [];
+
+            // Determine which tables are involved
+            const tableIds = [...new Set(selectedFields.map(f => f.split('.')[0]))];
+
+            // Simple approach: get data from first table and join others
+            if (tableIds.length === 1) {
+                const tableId = tableIds[0];
+                const tableData = Store.enteredData[tableId] || [];
+                const table = model.tables.find(t => t.id === tableId);
+
+                result = tableData.map(row => {
+                    const newRow = {};
+                    selectedFields.forEach(sf => {
+                        const [tId, fId] = sf.split('.');
+                        if (tId === tableId) {
+                            const field = table.fields.find(f => f.id === fId);
+                            if (field) {
+                                newRow[field.name] = row[field.name];
+                            }
+                        }
+                    });
+                    return newRow;
+                });
+            } else {
+                // Multi-table join
+                result = performJoin(tableIds, selectedFields);
+            }
+
+            // Apply filters
+            result = applyFilters(result);
+
+            // Apply aggregations if any
+            result = applyAggregations(result);
+
+            return result;
+        }
+
+        function performJoin(tableIds, selectedFields) {
+            const model = Store.currentModel;
+            const result = [];
+
+            // Simple nested loop join for demo purposes
+            const tables = tableIds.map(id => ({
+                table: model.tables.find(t => t.id === id),
+                data: Store.enteredData[id] || []
+            }));
+
+            if (tables.length === 0 || tables[0].data.length === 0) return [];
+
+            // Start with first table
+            tables[0].data.forEach(row1 => {
+                let joinedRow = { ...row1 };
+                let canJoin = true;
+
+                // Try to join with other tables
+                for (let i = 1; i < tables.length; i++) {
+                    const t = tables[i];
+                    const rel = findRelationship(tables[0].table.id, t.table.id);
+                    
+                    if (rel) {
+                        const matchingRow = t.data.find(r2 => {
+                            // Try to match on FK relationships
+                            const fromTable = model.tables.find(t => t.id === rel.fromTable);
+                            const pkField = fromTable?.fields.find(f => f.isPrimaryKey);
+                            if (pkField) {
+                                const pkValue = joinedRow[pkField.name] || joinedRow[fromTable.name + ' ID'];
+                                const fkValue = r2[fromTable.name + ' ID'] || r2[pkField.name];
+                                return pkValue === fkValue;
+                            }
+                            return false;
+                        });
+
+                        if (matchingRow) {
+                            joinedRow = { ...joinedRow, ...matchingRow };
+                        }
+                    } else {
+                        // No direct relationship, include first row
+                        if (t.data.length > 0) {
+                            joinedRow = { ...joinedRow, ...t.data[0] };
+                        }
+                    }
+                }
+
+                // Extract only selected fields
+                const finalRow = {};
+                selectedFields.forEach(sf => {
+                    const [tId, fId] = sf.split('.');
+                    const table = model.tables.find(t => t.id === tId);
+                    const field = table?.fields.find(f => f.id === fId);
+                    if (field && joinedRow[field.name] !== undefined) {
+                        finalRow[field.name] = joinedRow[field.name];
+                    }
+                });
+
+                result.push(finalRow);
+            });
+
+            return result;
+        }
+
+        function findRelationship(tableId1, tableId2) {
+            const model = Store.currentModel;
+            return model.relationships.find(r => 
+                (r.fromTable === tableId1 && r.toTable === tableId2) ||
+                (r.fromTable === tableId2 && r.toTable === tableId1)
+            );
+        }
+
+        function applyFilters(data) {
+            const filters = Store.reportConfig.filters;
+            if (filters.length === 0) return data;
+
+            return data.filter(row => {
+                return filters.every(filter => {
+                    if (!filter.field) return true;
+
+                    const [tableId, fieldId] = filter.field.split('.');
+                    const model = Store.currentModel;
+                    const table = model.tables.find(t => t.id === tableId);
+                    const field = table?.fields.find(f => f.id === fieldId);
+                    if (!field) return true;
+
+                    const value = row[field.name];
+                    const filterValue = filter.value;
+
+                    switch (filter.operator) {
+                        case 'eq': return String(value) === String(filterValue);
+                        case 'neq': return String(value) !== String(filterValue);
+                        case 'gt': return Number(value) > Number(filterValue);
+                        case 'lt': return Number(value) < Number(filterValue);
+                        case 'null': return value === null || value === undefined || value === '';
+                        case 'notnull': return value !== null && value !== undefined && value !== '';
+                        default: return true;
+                    }
+                });
+            });
+        }
+
+        function applyAggregations(data) {
+            const aggs = Store.reportConfig.aggregations;
+            const hasAggs = Object.values(aggs).some(v => v);
+            if (!hasAggs) return data;
+
+            const model = Store.currentModel;
+            const result = {};
+
+            Object.entries(aggs).forEach(([key, aggType]) => {
+                if (!aggType) return;
+
+                const [tableId, fieldId] = key.split('.');
+                const table = model.tables.find(t => t.id === tableId);
+                const field = table?.fields.find(f => f.id === fieldId);
+                if (!field) return;
+
+                const values = data.map(row => Number(row[field.name]) || 0);
+
+                switch (aggType) {
+                    case 'count':
+                        result[`${field.name} (Count)`] = values.length;
+                        break;
+                    case 'sum':
+                        result[`${field.name} (Sum)`] = values.reduce((a, b) => a + b, 0).toFixed(2);
+                        break;
+                    case 'avg':
+                        result[`${field.name} (Avg)`] = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
+                        break;
+                }
+            });
+
+            // If we have aggregations, return single row summary
+            if (Object.keys(result).length > 0) {
+                // Include non-aggregated fields from first row
+                const selectedFields = Store.reportConfig.selectedFields;
+                const firstRow = data[0] || {};
+                
+                selectedFields.forEach(sf => {
+                    const [tableId, fieldId] = sf.split('.');
+                    if (!aggs[sf]) {
+                        const table = model.tables.find(t => t.id === tableId);
+                        const field = table?.fields.find(f => f.id === fieldId);
+                        if (field && firstRow[field.name] !== undefined) {
+                            result[field.name] = firstRow[field.name];
+                        }
+                    }
+                });
+
+                return [result];
+            }
+
+            return data;
+        }
+
+        function getNumericSelectedFields() {
+            const model = Store.currentModel;
+            return Store.reportConfig.selectedFields
+                .map(sf => {
+                    const [tableId, fieldId] = sf.split('.');
+                    const table = model.tables.find(t => t.id === tableId);
+                    const field = table?.fields.find(f => f.id === fieldId);
+                    if (field && ['Number', 'Decimal'].includes(field.type)) {
+                        return { key: sf, fieldName: field.name };
+                    }
+                    return null;
+                })
+                .filter(Boolean);
+        }
+
+        function calculateStats(data) {
+            const model = Store.currentModel;
+            const stats = [];
+
+            // Calculate stats for numeric fields
+            Store.reportConfig.selectedFields.forEach(sf => {
+                const [tableId, fieldId] = sf.split('.');
+                const table = model.tables.find(t => t.id === tableId);
+                const field = table?.fields.find(f => f.id === fieldId);
+
+                if (field && ['Number', 'Decimal'].includes(field.type)) {
+                    const values = data.map(row => Number(row[field.name]) || 0).filter(v => !isNaN(v));
+                    if (values.length > 0) {
+                        const sum = values.reduce((a, b) => a + b, 0);
+                        stats.push({
+                            label: `${field.name} Total`,
+                            value: sum.toLocaleString(undefined, { maximumFractionDigits: 2 })
+                        });
+                    }
+                }
+            });
+
+            return stats;
+        }
+
+        // ============================================
+        // EVENT HANDLERS
+        // ============================================
+        function navigateTo(screen) {
+            Store.currentScreen = screen;
+            if (screen === 'data-entry') {
+                Store.entryMode = null;
+                Store.selectedTables = [];
+            }
+            render();
+        }
+
+        function createNewModel() {
+            const name = prompt('Enter data model name:');
+            if (!name) return;
+
+            const model = {
+                id: generateId(),
+                name: name,
+                description: '',
+                tables: [],
+                relationships: []
+            };
+
+            Store.dataModels.push(model);
+            openModel(model.id);
+        }
+
+        function openModel(id) {
+            Store.currentModel = Store.dataModels.find(m => m.id === id);
+            Store.selectedTable = null;
+            Store.currentScreen = 'designer';
+            render();
+        }
+
+        function selectTable(id) {
+            Store.selectedTable = Store.currentModel.tables.find(t => t.id === id);
+            render();
+        }
+
+        function switchPanelTab(tab) {
+            document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            
+            const content = document.getElementById('panelContent');
+            if (tab === 'fields') {
+                content.innerHTML = Store.selectedTable ? renderFieldsPanel(Store.selectedTable) : '<div class="empty-state"><p>Select a table</p></div>';
+            } else {
+                content.innerHTML = renderRelationshipsPanel();
+            }
+        }
+
+        function showAddTableModal() {
+            const modal = document.getElementById('modalContainer');
+            modal.innerHTML = `
+                <div class="modal-overlay" onclick="closeModal(event)">
+                    <div class="modal" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <span class="modal-title">Add New Table</span>
+                            <button class="modal-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="form-label">Table Name</label>
+                                <input type="text" class="form-input" id="newTableName" placeholder="e.g., Customers">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-checkbox">
+                                    <input type="checkbox" id="newTableJunction">
+                                    <span>This is a junction table (connects two other tables)</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="addTable()">Create Table</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addTable() {
+            const name = document.getElementById('newTableName').value.trim();
+            const isJunction = document.getElementById('newTableJunction').checked;
+
+            if (!name) {
+                alert('Please enter a table name');
+                return;
+            }
+
+            const table = {
+                id: generateId(),
+                name: name,
+                isJunction: isJunction,
+                position: { x: 50 + Math.random() * 200, y: 50 + Math.random() * 200 },
+                fields: [
+                    {
+                        id: generateId(),
+                        name: name + ' ID',
+                        type: 'Number',
+                        isPrimaryKey: true,
+                        isRequired: true,
+                        isUnique: true
+                    }
+                ]
+            };
+
+            Store.currentModel.tables.push(table);
+            Store.selectedTable = table;
+            closeModal();
+            render();
+        }
+
+        function updateTableName(tableId, name) {
+            const table = Store.currentModel.tables.find(t => t.id === tableId);
+            if (table) {
+                table.name = name;
+                render();
+            }
+        }
+
+        function toggleJunction(tableId, isJunction) {
+            const table = Store.currentModel.tables.find(t => t.id === tableId);
+            if (table) {
+                table.isJunction = isJunction;
+                render();
+            }
+        }
+
+        function deleteTable(tableId) {
+            if (!confirm('Are you sure you want to delete this table?')) return;
+
+            const model = Store.currentModel;
+            model.tables = model.tables.filter(t => t.id !== tableId);
+            model.relationships = model.relationships.filter(r => r.fromTable !== tableId && r.toTable !== tableId);
+            Store.selectedTable = null;
+            render();
+        }
+
+        function showAddFieldModal(tableId) {
+            const modal = document.getElementById('modalContainer');
+            modal.innerHTML = `
+                <div class="modal-overlay" onclick="closeModal(event)">
+                    <div class="modal" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <span class="modal-title">Add New Field</span>
+                            <button class="modal-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="form-label">Field Name</label>
+                                <input type="text" class="form-input" id="newFieldName" placeholder="e.g., Full Name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Field Type</label>
+                                <select class="form-select" id="newFieldType">
+                                    <option value="Text">Text</option>
+                                    <option value="Long Text">Long Text</option>
+                                    <option value="Number">Number</option>
+                                    <option value="Decimal">Decimal</option>
+                                    <option value="Email">Email</option>
+                                    <option value="Password">Password</option>
+                                    <option value="Date">Date</option>
+                                    <option value="Boolean">Yes / No</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-checkbox">
+                                    <input type="checkbox" id="newFieldRequired">
+                                    <span>Required field</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-checkbox">
+                                    <input type="checkbox" id="newFieldUnique">
+                                    <span>Unique ID field</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="addField('${tableId}')">Add Field</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addField(tableId) {
+            const name = document.getElementById('newFieldName').value.trim();
+            const type = document.getElementById('newFieldType').value;
+            const isRequired = document.getElementById('newFieldRequired').checked;
+            const isUnique = document.getElementById('newFieldUnique').checked;
+
+            if (!name) {
+                alert('Please enter a field name');
+                return;
+            }
+
+            const table = Store.currentModel.tables.find(t => t.id === tableId);
+            if (table) {
+                table.fields.push({
+                    id: generateId(),
+                    name: name,
+                    type: type,
+                    isPrimaryKey: false,
+                    isRequired: isRequired,
+                    isUnique: isUnique
+                });
+                closeModal();
+                render();
+            }
+        }
+
+        function showEditFieldModal(tableId, fieldId) {
+            const table = Store.currentModel.tables.find(t => t.id === tableId);
+            const field = table?.fields.find(f => f.id === fieldId);
+            if (!field) return;
+
+            const modal = document.getElementById('modalContainer');
+            modal.innerHTML = `
+                <div class="modal-overlay" onclick="closeModal(event)">
+                    <div class="modal" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <span class="modal-title">Edit Field</span>
+                            <button class="modal-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="form-label">Field Name</label>
+                                <input type="text" class="form-input" id="editFieldName" value="${field.name}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Field Type</label>
+                                <select class="form-select" id="editFieldType">
+                                    <option value="Text" ${field.type === 'Text' ? 'selected' : ''}>Text</option>
+                                    <option value="Long Text" ${field.type === 'Long Text' ? 'selected' : ''}>Long Text</option>
+                                    <option value="Number" ${field.type === 'Number' ? 'selected' : ''}>Number</option>
+                                    <option value="Decimal" ${field.type === 'Decimal' ? 'selected' : ''}>Decimal</option>
+                                    <option value="Email" ${field.type === 'Email' ? 'selected' : ''}>Email</option>
+                                    <option value="Password" ${field.type === 'Password' ? 'selected' : ''}>Password</option>
+                                    <option value="Date" ${field.type === 'Date' ? 'selected' : ''}>Date</option>
+                                    <option value="Boolean" ${field.type === 'Boolean' ? 'selected' : ''}>Yes / No</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-checkbox">
+                                    <input type="checkbox" id="editFieldRequired" ${field.isRequired ? 'checked' : ''}>
+                                    <span>Required field</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-checkbox">
+                                    <input type="checkbox" id="editFieldUnique" ${field.isUnique ? 'checked' : ''}>
+                                    <span>Unique ID field</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="updateField('${tableId}', '${fieldId}')">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateField(tableId, fieldId) {
+            const table = Store.currentModel.tables.find(t => t.id === tableId);
+            const field = table?.fields.find(f => f.id === fieldId);
+            if (!field) return;
+
+            field.name = document.getElementById('editFieldName').value.trim();
+            field.type = document.getElementById('editFieldType').value;
+            field.isRequired = document.getElementById('editFieldRequired').checked;
+            field.isUnique = document.getElementById('editFieldUnique').checked;
+
+            closeModal();
+            render();
+        }
+
+        function deleteField(tableId, fieldId) {
+            if (!confirm('Are you sure you want to delete this field?')) return;
+
+            const table = Store.currentModel.tables.find(t => t.id === tableId);
+            if (table) {
+                table.fields = table.fields.filter(f => f.id !== fieldId);
+                render();
+            }
+        }
+
+        function showAddRelationshipModal() {
+            const model = Store.currentModel;
+            const modal = document.getElementById('modalContainer');
+            modal.innerHTML = `
+                <div class="modal-overlay" onclick="closeModal(event)">
+                    <div class="modal" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <span class="modal-title">Add Relationship</span>
+                            <button class="modal-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="form-label">From Table</label>
+                                <select class="form-select" id="relFromTable">
+                                    <option value="">Select table...</option>
+                                    ${model.tables.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Relationship Type</label>
+                                <select class="form-select" id="relType">
+                                    <option value="one-to-one">One record matches one record</option>
+                                    <option value="one-to-many">One record matches many records</option>
+                                    <option value="many-to-many">Many records match many records</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">To Table</label>
+                                <select class="form-select" id="relToTable">
+                                    <option value="">Select table...</option>
+                                    ${model.tables.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="alert alert-info" id="manyToManyNote" style="display: none;">
+                                A junction table will be created automatically to connect these tables.
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="addRelationship()">Create Relationship</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('relType').addEventListener('change', function() {
+                document.getElementById('manyToManyNote').style.display = 
+                    this.value === 'many-to-many' ? 'block' : 'none';
+            });
+        }
+
+        function addRelationship() {
+            const fromTable = document.getElementById('relFromTable').value;
+            const toTable = document.getElementById('relToTable').value;
+            const type = document.getElementById('relType').value;
+
+            if (!fromTable || !toTable) {
+                alert('Please select both tables');
+                return;
+            }
+
+            if (fromTable === toTable) {
+                alert('Cannot create relationship to same table');
+                return;
+            }
+
+            const model = Store.currentModel;
+
+            // Check for duplicate
+            const exists = model.relationships.some(r => 
+                (r.fromTable === fromTable && r.toTable === toTable) ||
+                (r.fromTable === toTable && r.toTable === fromTable)
+            );
+
+            if (exists) {
+                alert('A relationship already exists between these tables');
+                return;
+            }
+
+            if (type === 'many-to-many') {
+                // Create junction table
+                const fromT = model.tables.find(t => t.id === fromTable);
+                const toT = model.tables.find(t => t.id === toTable);
+                const junctionName = `${fromT.name}_${toT.name}`;
+
+                const junctionTable = {
+                    id: generateId(),
+                    name: junctionName,
+                    isJunction: true,
+                    position: {
+                        x: (fromT.position.x + toT.position.x) / 2,
+                        y: (fromT.position.y + toT.position.y) / 2 + 100
+                    },
+                    fields: [
+                        { id: generateId(), name: junctionName + ' ID', type: 'Number', isPrimaryKey: true, isRequired: true, isUnique: true }
+                    ]
+                };
+
+                model.tables.push(junctionTable);
+
+                // Create two 1:N relationships
+                model.relationships.push({
+                    id: generateId(),
+                    fromTable: fromTable,
+                    toTable: junctionTable.id,
+                    type: 'one-to-many'
+                });
+
+                model.relationships.push({
+                    id: generateId(),
+                    fromTable: toTable,
+                    toTable: junctionTable.id,
+                    type: 'one-to-many'
+                });
+            } else {
+                model.relationships.push({
+                    id: generateId(),
+                    fromTable: fromTable,
+                    toTable: toTable,
+                    type: type
+                });
+            }
+
+            closeModal();
+            render();
+        }
+
+        function deleteRelationship(id) {
+            if (!confirm('Are you sure you want to delete this relationship?')) return;
+
+            Store.currentModel.relationships = Store.currentModel.relationships.filter(r => r.id !== id);
+            render();
+        }
+
+        function showSQLPreviewModal() {
+            const sql = generateSQL(Store.currentModel);
+            const modal = document.getElementById('modalContainer');
+            modal.innerHTML = `
+                <div class="modal-overlay" onclick="closeModal(event)">
+                    <div class="modal" style="max-width: 800px;" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <span class="modal-title">SQL Schema</span>
+                            <button class="modal-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <pre class="sql-preview">${highlightSQL(sql)}</pre>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" onclick="copySQL()">Copy SQL</button>
+                            <button class="btn btn-primary" onclick="downloadSQL()">Download .sql</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function highlightSQL(sql) {
+            return sql
+                .replace(/\b(CREATE TABLE|PRIMARY KEY|FOREIGN KEY|REFERENCES|NOT NULL|UNIQUE|INT|VARCHAR|TEXT|FLOAT|DATE|BOOLEAN)\b/g, '<span class="sql-keyword">$1</span>');
+        }
+
+        function copySQL() {
+            const sql = generateSQL(Store.currentModel);
+            navigator.clipboard.writeText(sql).then(() => {
+                alert('SQL copied to clipboard');
+            });
+        }
+
+        function downloadSQL() {
+            const sql = generateSQL(Store.currentModel);
+            const blob = new Blob([sql], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${Store.currentModel.name.replace(/\s+/g, '_').toLowerCase()}_schema.sql`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('modalContainer').innerHTML = '';
+        }
+
+        // Data Entry Handlers
+        function selectEntryMode(mode) {
+            Store.entryMode = mode;
+            Store.selectedTables = [];
+            render();
+        }
+
+        function toggleTableSelection(tableId) {
+            const idx = Store.selectedTables.indexOf(tableId);
+            if (idx >= 0) {
+                Store.selectedTables.splice(idx, 1);
+            } else {
+                Store.selectedTables.push(tableId);
+            }
+            render();
+        }
+
+        function startDataEntry() {
+            if (Store.entryMode === 'flow') {
+                Store.selectedTables = Store.currentModel.tables.map(t => t.id);
+            }
+
+            if (Store.selectedTables.length === 0) {
+                alert('Please select at least one table');
+                return;
+            }
+
+            Store.currentScreen = 'data-entry-form';
+            render();
+        }
+
+        function addRepeatableRow(tableId) {
+            const container = document.getElementById(`repeatable-${tableId}`);
+            const table = Store.currentModel.tables.find(t => t.id === tableId);
+            const currentRows = container.querySelectorAll('.repeatable-section').length;
+            
+            const newRow = document.createElement('div');
+            newRow.innerHTML = renderRepeatableRow(table, currentRows);
+            container.appendChild(newRow.firstElementChild);
+        }
+
+        function removeRepeatableRow(tableId, index) {
+            const container = document.getElementById(`repeatable-${tableId}`);
+            const row = container.querySelector(`[data-row-index="${index}"]`);
+            if (row) {
+                row.remove();
+                // Re-index remaining rows
+                container.querySelectorAll('.repeatable-section').forEach((r, i) => {
+                    r.dataset.rowIndex = i;
+                    r.querySelector('.repeatable-title').textContent = `Entry ${i + 1}`;
+                });
+            }
+        }
+
+        function submitDataEntry(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const model = Store.currentModel;
+            const tablesToProcess = getEntryTables();
+
+            const flowSteps = [];
+
+            tablesToProcess.forEach(table => {
+                const isRepeatable = isTableRepeatable(table.id);
+                
+                if (!Store.enteredData[table.id]) {
+                    Store.enteredData[table.id] = [];
+                }
+
+                if (isRepeatable) {
+                    // Handle repeatable rows
+                    const container = document.getElementById(`repeatable-${table.id}`);
+                    const rows = container?.querySelectorAll('.repeatable-section') || [];
+                    
+                    rows.forEach((row, rowIndex) => {
+                        const record = {};
+                        const pkField = table.fields.find(f => f.isPrimaryKey);
+                        if (pkField) {
+                            record[pkField.name] = generateNumericId();
+                        }
+
+                        table.fields.filter(f => !f.isPrimaryKey).forEach(field => {
+                            const key = `${table.id}_${rowIndex}_${field.id}`;
+                            let value = formData.get(key);
+                            
+                            if (field.type === 'Number') value = parseInt(value) || 0;
+                            else if (field.type === 'Decimal') value = parseFloat(value) || 0;
+                            else if (field.type === 'Boolean') value = value === 'true';
+                            
+                            record[field.name] = value;
+                        });
+
+                        // Add FK references
+                        const parentTable = getParentTable(table.id);
+                        if (parentTable) {
+                            const parentData = Store.enteredData[parentTable.id];
+                            if (parentData && parentData.length > 0) {
+                                const pkField = parentTable.fields.find(f => f.isPrimaryKey);
+                                if (pkField) {
+                                    record[parentTable.name + ' ID'] = parentData[parentData.length - 1][pkField.name];
+                                }
+                            }
+                        }
+
+                        Store.enteredData[table.id].push(record);
+
+                        flowSteps.push({
+                            table: table.name,
+                            action: 'Created',
+                            data: record
+                        });
+                    });
+                } else {
+                    // Handle single entry
+                    const record = {};
+                    const pkField = table.fields.find(f => f.isPrimaryKey);
+                    if (pkField) {
+                        record[pkField.name] = generateNumericId();
+                    }
+
+                    table.fields.filter(f => !f.isPrimaryKey).forEach(field => {
+                        const key = `${table.id}_${field.id}`;
+                        let value = formData.get(key);
+                        
+                        if (field.type === 'Number') value = parseInt(value) || 0;
+                        else if (field.type === 'Decimal') value = parseFloat(value) || 0;
+                        else if (field.type === 'Boolean') value = value === 'true';
+                        
+                        record[field.name] = value;
+                    });
+
+                    // Add FK references
+                    const parentTable = getParentTable(table.id);
+                    if (parentTable) {
+                        const parentData = Store.enteredData[parentTable.id];
+                        if (parentData && parentData.length > 0) {
+                            const pkField = parentTable.fields.find(f => f.isPrimaryKey);
+                            if (pkField) {
+                                record[parentTable.name + ' ID'] = parentData[parentData.length - 1][pkField.name];
+                            }
+                        }
+                    }
+
+                    Store.enteredData[table.id].push(record);
+
+                    flowSteps.push({
+                        table: table.name,
+                        action: 'Created',
+                        data: record
+                    });
+                }
+            });
+
+            // Show data flow visualization
+            showDataFlowViz(flowSteps);
+        }
+
+        function showDataFlowViz(steps) {
+            const viz = document.getElementById('dataFlowViz');
+            viz.innerHTML = `
+                <div class="data-flow-viz">
+                    <h3 style="margin-bottom: 20px;">Data Flow Visualization</h3>
+                    <div class="alert alert-success" style="margin-bottom: 20px;">
+                        Data submitted successfully! ${steps.length} record(s) created.
+                    </div>
+                    ${steps.map((step, i) => `
+                        <div class="flow-step">
+                            <div class="flow-step-number">${i + 1}</div>
+                            <div class="flow-step-content">
+                                <div class="flow-step-title">${step.action} record in ${step.table}</div>
+                                <div class="flow-step-data">${JSON.stringify(step.data, null, 2)}</div>
+                            </div>
+                        </div>
+                        ${i < steps.length - 1 ? '<div class="flow-arrow">↓</div>' : ''}
+                    `).join('')}
+                    <div style="margin-top: 24px; display: flex; gap: 12px;">
+                        <button class="btn btn-primary" onclick="resetForm()">Enter More Data</button>
+                        <button class="btn btn-secondary" onclick="navigateTo('reports')">View Reports</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetForm() {
+            Store.currentScreen = 'data-entry';
+            Store.entryMode = null;
+            Store.selectedTables = [];
+            render();
+        }
+
+        // Report Handlers
+        function toggleReportField(tableId, fieldId) {
+            const key = `${tableId}.${fieldId}`;
+            const idx = Store.reportConfig.selectedFields.indexOf(key);
+            if (idx >= 0) {
+                Store.reportConfig.selectedFields.splice(idx, 1);
+                delete Store.reportConfig.aggregations[key];
+            } else {
+                Store.reportConfig.selectedFields.push(key);
+            }
+            render();
+        }
+
+        function setAggregation(key, value) {
+            Store.reportConfig.aggregations[key] = value || null;
+            render();
+        }
+
+        function addFilter() {
+            Store.reportConfig.filters.push({
+                field: '',
+                operator: 'eq',
+                value: ''
+            });
+            render();
+        }
+
+        function updateFilter(index, prop, value) {
+            Store.reportConfig.filters[index][prop] = value;
+            render();
+        }
+
+        function removeFilter(index) {
+            Store.reportConfig.filters.splice(index, 1);
+            render();
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        function init() {
+            // Create demo model
+            const demoModel = createDemoModel();
+            Store.dataModels.push(demoModel);
+            Store.currentModel = demoModel;
+
+            // Create demo data
+            createDemoData();
+
+            // Render initial screen
+            render();
+        }
+
+        // Start the application
+        init();
+    </script>
+</body>
+</html>
