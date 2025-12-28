@@ -3,3368 +3,635 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Builder v4</title>
+    <title>Form Builder v5</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
-        :root {
-            --bg-primary: #0f1419;
-            --bg-secondary: #1a1f26;
-            --bg-tertiary: #242b33;
-            --bg-hover: #2d353f;
-            --border-color: #3d4654;
-            --text-primary: #e7eaed;
-            --text-secondary: #8b929a;
-            --text-muted: #6b7280;
-            --accent-primary: #3b82f6;
-            --accent-secondary: #60a5fa;
-            --accent-success: #22c55e;
-            --accent-warning: #f59e0b;
-            --accent-danger: #ef4444;
-            --accent-purple: #8b5cf6;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            --radius: 8px;
-            --radius-lg: 12px;
-            --font-mono: 'Consolas', 'Monaco', monospace;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .header h1 {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .header-nav {
-            display: flex;
-            gap: 8px;
-        }
-
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        .breadcrumb span {
-            cursor: pointer;
-        }
-
-        .breadcrumb span:hover {
-            color: var(--accent-primary);
-        }
-
-        .breadcrumb .separator {
-            color: var(--text-muted);
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-        }
-
-        .btn {
-            padding: 10px 18px;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: var(--accent-primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-secondary);
-        }
-
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-hover);
-        }
-
-        .btn-danger {
-            background: var(--accent-danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .btn-success {
-            background: var(--accent-success);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #16a34a;
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 13px;
-        }
-
-        .btn-icon {
-            padding: 8px;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--text-primary);
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-        }
-
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
-            padding: 10px 12px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            color: var(--text-primary);
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-        }
-
-        .form-textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .form-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .form-checkbox input {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--accent-primary);
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 24px;
-            line-height: 1;
-        }
-
-        .modal-close:hover {
-            color: var(--text-primary);
-        }
-
-        .modal-body {
-            padding: 24px;
-        }
-
-        .modal-footer {
-            padding: 16px 24px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-
-        .home-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: calc(100vh - 200px);
-            gap: 32px;
-        }
-
-        .home-title {
-            font-size: 32px;
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .home-subtitle {
-            font-size: 16px;
-            color: var(--text-secondary);
-            text-align: center;
-            max-width: 500px;
-        }
-
-        .home-actions {
-            display: flex;
-            gap: 24px;
-        }
-
-        .home-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 40px 48px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
-
-        .home-card:hover {
-            border-color: var(--accent-primary);
-            transform: translateY(-2px);
-        }
-
-        .home-card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .home-card p {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .pages-list {
-            display: grid;
-            gap: 12px;
-            max-width: 500px;
-        }
-
-        .page-item {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .page-item span {
-            font-size: 15px;
-        }
-
-        .page-badge {
-            font-size: 12px;
-            color: var(--text-muted);
-            background: var(--bg-tertiary);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        .data-models-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .model-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .model-card:hover {
-            border-color: var(--accent-primary);
-        }
-
-        .model-card h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .model-card p {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .model-card-meta {
-            display: flex;
-            gap: 16px;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .designer-layout {
-            display: grid;
-            grid-template-columns: 280px 1fr 320px;
-            gap: 20px;
-            height: calc(100vh - 140px);
-        }
-
-        .designer-sidebar {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-header {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .sidebar-title {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .sidebar-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px;
-        }
-
-        .table-list-item {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 12px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .table-list-item:hover {
-            border-color: var(--accent-primary);
-        }
-
-        .table-list-item.active {
-            border-color: var(--accent-primary);
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .table-list-item.junction {
-            border-left: 3px solid var(--accent-purple);
-        }
-
-        .table-list-item h4 {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .table-list-item p {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .designer-canvas {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .canvas-toolbar {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            display: flex;
-            gap: 8px;
-            z-index: 10;
-        }
-
-        .er-canvas {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            overflow: auto;
-            padding: 60px 20px 20px;
-        }
-
-        .er-table {
-            position: absolute;
-            background: var(--bg-tertiary);
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius);
-            min-width: 200px;
-            cursor: move;
-            user-select: none;
-        }
-
-        .er-table.junction {
-            border-color: var(--accent-purple);
-        }
-
-        .er-table.selected {
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
-        }
-
-        .er-table-header {
-            background: var(--bg-hover);
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border-color);
-            font-weight: 600;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .er-table.junction .er-table-header {
-            background: rgba(139, 92, 246, 0.15);
-        }
-
-        .junction-badge {
-            font-size: 10px;
-            background: var(--accent-purple);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        .er-table-fields {
-            padding: 8px 0;
-        }
-
-        .er-field {
-            padding: 6px 14px;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .er-field-name {
-            flex: 1;
-        }
-
-        .er-field-type {
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        .er-field-pk {
-            color: var(--accent-warning);
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .er-field-fk {
-            color: var(--accent-purple);
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .er-field-required {
-            color: var(--accent-danger);
-            font-size: 10px;
-        }
-
-        .relationship-line {
-            position: absolute;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .designer-panel {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .panel-tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .panel-tab {
-            flex: 1;
-            padding: 12px;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .panel-tab:hover {
-            color: var(--text-primary);
-            background: var(--bg-tertiary);
-        }
-
-        .panel-tab.active {
-            color: var(--accent-primary);
-            background: var(--bg-tertiary);
-            border-bottom: 2px solid var(--accent-primary);
-        }
-
-        .panel-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
-        .field-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .field-item {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 12px;
-        }
-
-        .field-item-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .field-item-name {
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .field-item-actions {
-            display: flex;
-            gap: 4px;
-        }
-
-        .field-item-meta {
-            display: flex;
-            gap: 12px;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .relationship-item {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 12px;
-            margin-bottom: 8px;
-        }
-
-        .relationship-visual {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
-        .relationship-table {
-            background: var(--bg-hover);
-            padding: 6px 12px;
-            border-radius: var(--radius);
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .relationship-arrow {
-            color: var(--accent-primary);
-            font-size: 16px;
-        }
-
-        .relationship-type {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .sql-preview {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 16px;
-            font-family: var(--font-mono);
-            font-size: 12px;
-            line-height: 1.6;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .sql-keyword {
-            color: var(--accent-primary);
-        }
-
-        .sql-string {
-            color: var(--accent-success);
-        }
-
-        .sql-type {
-            color: var(--accent-warning);
-        }
-
-        .data-entry-modes {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            max-width: 900px;
-            margin: 40px auto;
-        }
-
-        .mode-card {
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 32px 24px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
-
-        .mode-card:hover {
-            border-color: var(--accent-primary);
-        }
-
-        .mode-card.selected {
-            border-color: var(--accent-primary);
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .mode-card h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .mode-card p {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        .table-selector {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 20px 0;
-        }
-
-        .table-chip {
-            padding: 8px 16px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s;
-        }
-
-        .table-chip:hover {
-            border-color: var(--accent-primary);
-        }
-
-        .table-chip.selected {
-            background: var(--accent-primary);
-            border-color: var(--accent-primary);
-            color: white;
-        }
-
-        .data-form {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .form-section {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .form-section-header {
-            padding: 16px 20px;
-            background: var(--bg-tertiary);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .form-section-title {
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .form-section-body {
-            padding: 20px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .repeatable-section {
-            border: 1px dashed var(--border-color);
-            border-radius: var(--radius);
-            padding: 16px;
-            margin-bottom: 12px;
-        }
-
-        .repeatable-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .repeatable-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        .data-flow-viz {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            margin-top: 24px;
-        }
-
-        .flow-step {
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .flow-step-number {
-            width: 32px;
-            height: 32px;
-            background: var(--accent-primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .flow-step-content {
-            flex: 1;
-        }
-
-        .flow-step-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .flow-step-data {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 12px;
-            font-family: var(--font-mono);
-            font-size: 12px;
-        }
-
-        .flow-arrow {
-            display: flex;
-            justify-content: center;
-            padding: 8px 0;
-            color: var(--accent-primary);
-            font-size: 20px;
-        }
-
-        .report-builder {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 20px;
-            height: calc(100vh - 140px);
-        }
-
-        .report-config {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .report-preview {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            overflow-y: auto;
-        }
-
-        .field-selector {
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .field-option {
-            padding: 10px 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 13px;
-        }
-
-        .field-option:last-child {
-            border-bottom: none;
-        }
-
-        .field-option:hover {
-            background: var(--bg-tertiary);
-        }
-
-        .field-option input {
-            accent-color: var(--accent-primary);
-        }
-
-        .field-option .table-name {
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        .chart-container {
-            background: var(--bg-tertiary);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .chart-container canvas {
-            max-height: 300px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 20px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--accent-primary);
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .data-table th {
-            background: var(--bg-tertiary);
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .data-table tr:hover {
-            background: var(--bg-tertiary);
-        }
-
-        .filter-builder {
-            margin-top: 16px;
-        }
-
-        .filter-row {
-            display: grid;
-            grid-template-columns: 1fr 120px 1fr auto;
-            gap: 8px;
-            margin-bottom: 8px;
-            align-items: center;
-        }
-
-        .filter-row select,
-        .filter-row input {
-            padding: 8px 10px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            color: var(--text-primary);
-            font-size: 13px;
-        }
-
-        .aggregation-options {
-            margin-top: 12px;
-        }
-
-        .agg-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px;
-            background: var(--bg-tertiary);
-            border-radius: var(--radius);
-            margin-bottom: 6px;
-        }
-
-        .agg-field {
-            flex: 1;
-            font-size: 13px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
-        }
-
-        .empty-state h3 {
-            font-size: 18px;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-
-        .empty-state p {
-            font-size: 14px;
-        }
-
-        .tab-group {
-            display: flex;
-            gap: 4px;
-            background: var(--bg-tertiary);
-            padding: 4px;
-            border-radius: var(--radius);
-            margin-bottom: 16px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 8px 12px;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 13px;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-
-        .tab-btn:hover {
-            color: var(--text-primary);
-        }
-
-        .tab-btn.active {
-            background: var(--bg-secondary);
-            color: var(--accent-primary);
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .inline-form {
-            display: flex;
-            gap: 8px;
-            align-items: flex-end;
-        }
-
-        .inline-form .form-group {
-            margin-bottom: 0;
-            flex: 1;
-        }
-
-        .alert {
-            padding: 12px 16px;
-            border-radius: var(--radius);
-            margin-bottom: 16px;
-            font-size: 14px;
-        }
-
-        .alert-info {
-            background: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            color: var(--accent-secondary);
-        }
-
-        .alert-success {
-            background: rgba(34, 197, 94, 0.15);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            color: var(--accent-success);
-        }
-
-        .alert-warning {
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: var(--accent-warning);
-        }
-
-        .divider {
-            height: 1px;
-            background: var(--border-color);
-            margin: 16px 0;
-        }
-
-        .tag {
-            display: inline-block;
-            padding: 2px 8px;
-            background: var(--bg-hover);
-            border-radius: 4px;
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-
-        .tag-purple {
-            background: rgba(139, 92, 246, 0.2);
-            color: var(--accent-purple);
-        }
-
-        .scrollable {
-            overflow-y: auto;
-        }
-
-        @media (max-width: 1200px) {
-            .designer-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .report-builder {
-                grid-template-columns: 1fr;
-            }
-        }
+        :root{--bg-primary:#0f1419;--bg-secondary:#1a1f26;--bg-tertiary:#242b33;--bg-hover:#2d353f;--border:#3d4654;--text:#e7eaed;--text-sec:#8b929a;--text-muted:#6b7280;--accent:#3b82f6;--accent2:#60a5fa;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--purple:#8b5cf6;--radius:8px}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',sans-serif;background:var(--bg-primary);color:var(--text);min-height:100vh;line-height:1.6}
+        .app{display:flex;flex-direction:column;min-height:100vh}
+        .header{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+        .breadcrumb{display:flex;align-items:center;gap:8px;color:var(--text-sec);font-size:14px}
+        .breadcrumb span{cursor:pointer}.breadcrumb span:hover{color:var(--accent)}
+        .breadcrumb .sep{color:var(--text-muted)}
+        .main{flex:1;padding:24px;overflow-y:auto}
+        .btn{padding:10px 18px;border:none;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+        .btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:var(--accent2)}
+        .btn-s{background:var(--bg-tertiary);color:var(--text);border:1px solid var(--border)}.btn-s:hover{background:var(--bg-hover)}
+        .btn-d{background:var(--danger);color:#fff}
+        .btn-g{background:var(--success);color:#fff}
+        .btn-sm{padding:6px 12px;font-size:13px}
+        .btn-icon{padding:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+        .form-group{margin-bottom:16px}
+        .form-label{display:block;font-size:13px;font-weight:500;color:var(--text-sec);margin-bottom:6px}
+        .form-input,.form-select,.form-textarea{width:100%;padding:10px 12px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:14px}
+        .form-input:focus,.form-select:focus{outline:none;border-color:var(--accent)}
+        .form-textarea{min-height:80px;resize:vertical;font-family:inherit}
+        .form-check{display:flex;align-items:center;gap:8px;cursor:pointer}
+        .form-check input{width:18px;height:18px;accent-color:var(--accent)}
+        .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:1000}
+        .modal{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
+        .modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+        .modal-title{font-size:18px;font-weight:600}
+        .modal-close{background:none;border:none;color:var(--text-sec);cursor:pointer;font-size:24px}
+        .modal-body{padding:24px}
+        .modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:12px}
+        .home-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:32px}
+        .home-title{font-size:32px;font-weight:700}
+        .home-sub{font-size:16px;color:var(--text-sec);text-align:center;max-width:500px}
+        .home-actions{display:flex;gap:24px}
+        .home-card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;padding:40px 48px;cursor:pointer;transition:all .2s;text-align:center}
+        .home-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+        .home-card h3{font-size:18px;margin-bottom:8px}
+        .home-card p{font-size:14px;color:var(--text-sec)}
+        .models-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+        .model-card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;padding:24px;cursor:pointer;transition:all .2s}
+        .model-card:hover{border-color:var(--accent)}
+        .model-card h3{font-size:16px;margin-bottom:8px}
+        .model-card p{font-size:13px;color:var(--text-sec);margin-bottom:12px}
+        .model-meta{display:flex;gap:16px;font-size:12px;color:var(--text-muted)}
+        .designer{display:grid;grid-template-columns:280px 1fr 300px;gap:20px;height:calc(100vh - 140px)}
+        .sidebar{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;overflow:hidden}
+        .sidebar-header{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+        .sidebar-title{font-size:14px;font-weight:600}
+        .sidebar-content{overflow-y:auto;padding:12px;max-height:180px;flex-shrink:0}
+        .table-item{background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+        .table-item:hover,.table-item.active{border-color:var(--accent)}
+        .table-item.active{background:rgba(59,130,246,.1)}
+        .table-item.junction{border-left:3px solid var(--purple)}
+        .table-item h4{font-size:14px;margin-bottom:4px}
+        .table-item p{font-size:12px;color:var(--text-muted)}
+        .canvas{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;position:relative;overflow:hidden}
+        .canvas-toolbar{position:absolute;top:12px;left:12px;display:flex;gap:8px;z-index:10}
+        .er-canvas{width:100%;height:100%;position:relative;overflow:auto;padding:60px 20px 20px}
+        .er-table{position:absolute;background:var(--bg-tertiary);border:2px solid var(--border);border-radius:var(--radius);min-width:180px;cursor:move;user-select:none}
+        .er-table.junction{border-color:var(--purple)}
+        .er-table.selected{border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,130,246,.3)}
+        .er-table-header{background:var(--bg-hover);padding:10px 14px;border-bottom:1px solid var(--border);font-weight:600;font-size:13px}
+        .er-table.junction .er-table-header{background:rgba(139,92,246,.15)}
+        .er-field{padding:5px 14px;font-size:12px;display:flex;align-items:center;gap:6px}
+        .er-field-name{flex:1}
+        .er-field-type{color:var(--text-muted);font-size:10px}
+        .er-field-pk{color:var(--warning);font-size:9px;font-weight:600}
+        .er-field-fk{color:var(--purple);font-size:9px;font-weight:600}
+        .panel{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;overflow:hidden}
+        .panel-tabs{display:flex;border-bottom:1px solid var(--border)}
+        .panel-tab{flex:1;padding:12px;background:none;border:none;color:var(--text-sec);cursor:pointer;font-size:13px}
+        .panel-tab:hover{color:var(--text);background:var(--bg-tertiary)}
+        .panel-tab.active{color:var(--accent);background:var(--bg-tertiary);border-bottom:2px solid var(--accent)}
+        .panel-content{flex:1;overflow-y:auto;padding:16px}
+        .field-item{background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px}
+        .field-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+        .field-name{font-weight:500;font-size:14px}
+        .field-actions{display:flex;gap:4px}
+        .field-meta{display:flex;gap:12px;font-size:12px;color:var(--text-muted)}
+        .rel-item{background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px}
+        .rel-visual{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+        .rel-table{background:var(--bg-hover);padding:5px 10px;border-radius:var(--radius);font-size:12px}
+        .rel-arrow{color:var(--accent)}
+        .sql-preview{background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-family:Consolas,monospace;font-size:12px;white-space:pre-wrap;max-height:400px;overflow:auto}
+        .entry-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:900px;margin:40px auto}
+        .mode-card{background:var(--bg-secondary);border:2px solid var(--border);border-radius:12px;padding:32px 24px;cursor:pointer;text-align:center;transition:all .2s}
+        .mode-card:hover,.mode-card.selected{border-color:var(--accent)}
+        .mode-card.selected{background:rgba(59,130,246,.1)}
+        .mode-card h3{font-size:16px;margin-bottom:12px}
+        .mode-card p{font-size:13px;color:var(--text-sec)}
+        .table-chips{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0;justify-content:center}
+        .table-chip{padding:8px 16px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:20px;cursor:pointer;font-size:13px}
+        .table-chip:hover{border-color:var(--accent)}
+        .table-chip.selected{background:var(--accent);border-color:var(--accent);color:#fff}
+        .data-form{max-width:800px;margin:0 auto}
+        .form-section{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;margin-bottom:20px;overflow:hidden}
+        .form-section-header{padding:16px 20px;background:var(--bg-tertiary);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+        .form-section-title{font-size:15px;font-weight:600}
+        .form-section-body{padding:20px}
+        .form-row{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+        .repeat-section{border:1px dashed var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+        .repeat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+        .repeat-title{font-size:13px;color:var(--text-sec)}
+        .flow-viz{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;padding:24px;margin-top:24px}
+        .flow-step{display:flex;gap:16px;margin-bottom:20px}
+        .flow-num{width:32px;height:32px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;flex-shrink:0}
+        .flow-content{flex:1}
+        .flow-title{font-weight:600;margin-bottom:8px}
+        .flow-data{background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);padding:12px;font-family:monospace;font-size:12px;white-space:pre-wrap}
+        .flow-arrow{text-align:center;color:var(--accent);font-size:20px;padding:8px 0}
+        .report-builder{display:grid;grid-template-columns:280px 1fr;gap:20px;height:calc(100vh - 140px)}
+        .report-config{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;overflow:hidden}
+        .report-preview{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;padding:24px;overflow-y:auto}
+        .field-selector{border:1px solid var(--border);border-radius:var(--radius);max-height:200px;overflow-y:auto}
+        .field-opt{padding:10px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px}
+        .field-opt:hover{background:var(--bg-tertiary)}
+        .field-opt input{accent-color:var(--accent)}
+        .field-opt .tname{color:var(--text-muted);font-size:11px;margin-left:auto}
+        .chart-box{background:var(--bg-tertiary);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:20px}
+        .stat-card{background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center}
+        .stat-value{font-size:28px;font-weight:700;color:var(--accent)}
+        .stat-label{font-size:12px;color:var(--text-sec)}
+        .data-table{width:100%;border-collapse:collapse;font-size:13px}
+        .data-table th,.data-table td{padding:12px;text-align:left;border-bottom:1px solid var(--border)}
+        .data-table th{background:var(--bg-tertiary);font-weight:600;color:var(--text-sec)}
+        .data-table tr:hover{background:var(--bg-tertiary)}
+        .empty{text-align:center;padding:40px 20px;color:var(--text-sec)}
+        .empty h3{font-size:18px;margin-bottom:8px;color:var(--text)}
+        .divider{height:1px;background:var(--border);margin:16px 0}
+        .tag{display:inline-block;padding:2px 8px;background:var(--bg-hover);border-radius:4px;font-size:11px;color:var(--text-sec)}
+        .tag-purple{background:rgba(139,92,246,.2);color:var(--purple)}
+        .alert{padding:12px 16px;border-radius:var(--radius);margin-bottom:16px;font-size:14px}
+        .alert-success{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--success)}
+        .alert-info{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:var(--accent2)}
+        .inline-form{display:flex;gap:8px;align-items:flex-end}
+        .inline-form .form-group{margin-bottom:0;flex:1}
+        .nav-btns{display:flex;gap:8px}
+        .chat-container{flex:1;display:flex;flex-direction:column;border-top:1px solid var(--border);min-height:0;overflow:hidden}
+        .chat-header{padding:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg-tertiary);flex-shrink:0}
+        .chat-title{font-size:13px;font-weight:600;color:var(--accent)}
+        .chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:100px}
+        .chat-msg{display:flex;flex-direction:column;max-width:95%}
+        .chat-msg.user{align-self:flex-end}
+        .chat-msg.bot{align-self:flex-start}
+        .chat-msg-content{padding:10px 12px;border-radius:var(--radius);font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+        .chat-msg.user .chat-msg-content{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+        .chat-msg.bot .chat-msg-content{background:var(--bg-tertiary);color:var(--text);border-bottom-left-radius:4px}
+        .chat-msg-sql{margin-top:8px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-family:monospace;font-size:11px;overflow-x:auto;white-space:pre;max-height:120px;overflow-y:auto}
+        .chat-input-box{padding:12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
+        .chat-input{flex:1;padding:8px 12px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;resize:none;font-family:inherit;max-height:60px}
+        .chat-input:focus{outline:none;border-color:var(--accent)}
+        .chat-actions{padding:0 12px 12px;display:flex;gap:8px;flex-shrink:0}
+        .chat-loading{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-tertiary);border-radius:var(--radius);font-size:13px;color:var(--text-sec)}
+        .chat-dots{display:flex;gap:4px}
+        .chat-dots span{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 1.4s infinite ease-in-out both}
+        .chat-dots span:nth-child(1){animation-delay:-.32s}
+        .chat-dots span:nth-child(2){animation-delay:-.16s}
+        @keyframes pulse{0%,80%,100%{transform:scale(0);opacity:.5}40%{transform:scale(1);opacity:1}}
+        .sql-badge{display:inline-block;padding:2px 6px;background:var(--success);color:#fff;border-radius:4px;font-size:10px;margin-bottom:6px}
+        @media(max-width:1200px){.designer,.report-builder{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
-    <div class="app-container" id="app">
-        <!-- Content will be rendered by JavaScript -->
-    </div>
+<div class="app" id="app"></div>
+<script>
+var Store={dataModels:[],currentModel:null,selectedTable:null,enteredData:{},currentScreen:'home',entryMode:null,selectedTables:[],reportConfig:{selectedFields:[],chartType:'bar',showChart:true,showStats:true,showTable:true}};
+var Chat={messages:[],lastSQL:null,loading:false,apiKey:'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'};
+var PROMPT='You are a SQL schema designer. Design database schemas only. When generating SQL, wrap in ```sql code block. Use CREATE TABLE only with INT, VARCHAR(255), TEXT, FLOAT, DATE, BOOLEAN. Include PRIMARY KEY, NOT NULL, FOREIGN KEY constraints.';
 
-    <script>
-        // ============================================
-        // DATA STORE
-        // ============================================
-        const Store = {
-            dataModels: [],
-            currentModel: null,
-            selectedTable: null,
-            enteredData: {},
-            currentScreen: 'home',
-            entryMode: null,
-            selectedTables: [],
-            reportConfig: {
-                selectedFields: [],
-                aggregations: {},
-                filters: [],
-                chartType: 'bar',
-                showChart: true,
-                showStats: true,
-                showTable: true
-            }
-        };
+function gid(){return 'id_'+Math.random().toString(36).substr(2,9)}
+function gnid(){return Math.floor(Math.random()*900000)+100000}
+function esc(t){return t?String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''}
 
-        // ============================================
-        // UTILITY FUNCTIONS
-        // ============================================
-        function generateId() {
-            return 'id_' + Math.random().toString(36).substr(2, 9);
+function createDemo(){
+    var m={id:gid(),name:'E-Commerce Demo',description:'Sample e-commerce data model',tables:[],relationships:[]};
+    var cust={id:gid(),name:'Customers',isJunction:false,position:{x:50,y:50},fields:[
+        {id:gid(),name:'Customer ID',type:'Number',isPrimaryKey:true,isRequired:true,isUnique:true},
+        {id:gid(),name:'Full Name',type:'Text',isPrimaryKey:false,isRequired:true,isUnique:false},
+        {id:gid(),name:'Email',type:'Email',isPrimaryKey:false,isRequired:true,isUnique:true},
+        {id:gid(),name:'Phone',type:'Text',isPrimaryKey:false,isRequired:false,isUnique:false}
+    ]};
+    var prod={id:gid(),name:'Products',isJunction:false,position:{x:400,y:50},fields:[
+        {id:gid(),name:'Product ID',type:'Number',isPrimaryKey:true,isRequired:true,isUnique:true},
+        {id:gid(),name:'Product Name',type:'Text',isPrimaryKey:false,isRequired:true,isUnique:false},
+        {id:gid(),name:'Price',type:'Decimal',isPrimaryKey:false,isRequired:true,isUnique:false},
+        {id:gid(),name:'Stock',type:'Number',isPrimaryKey:false,isRequired:true,isUnique:false}
+    ]};
+    var ord={id:gid(),name:'Orders',isJunction:false,position:{x:50,y:250},fields:[
+        {id:gid(),name:'Order ID',type:'Number',isPrimaryKey:true,isRequired:true,isUnique:true},
+        {id:gid(),name:'Order Date',type:'Date',isPrimaryKey:false,isRequired:true,isUnique:false},
+        {id:gid(),name:'Total',type:'Decimal',isPrimaryKey:false,isRequired:true,isUnique:false},
+        {id:gid(),name:'Status',type:'Text',isPrimaryKey:false,isRequired:true,isUnique:false}
+    ]};
+    var op={id:gid(),name:'Order_Items',isJunction:true,position:{x:250,y:250},fields:[
+        {id:gid(),name:'Item ID',type:'Number',isPrimaryKey:true,isRequired:true,isUnique:true},
+        {id:gid(),name:'Quantity',type:'Number',isPrimaryKey:false,isRequired:true,isUnique:false},
+        {id:gid(),name:'Price',type:'Decimal',isPrimaryKey:false,isRequired:true,isUnique:false}
+    ]};
+    m.tables=[cust,prod,ord,op];
+    m.relationships=[
+        {id:gid(),fromTable:cust.id,toTable:ord.id,type:'one-to-many'},
+        {id:gid(),fromTable:ord.id,toTable:op.id,type:'one-to-many'},
+        {id:gid(),fromTable:prod.id,toTable:op.id,type:'one-to-many'}
+    ];
+    return m;
+}
+
+function createDemoData(){
+    var m=Store.currentModel;if(!m)return;
+    var ct=m.tables.find(function(t){return t.name==='Customers'});
+    var pt=m.tables.find(function(t){return t.name==='Products'});
+    var ot=m.tables.find(function(t){return t.name==='Orders'});
+    if(ct)Store.enteredData[ct.id]=[
+        {'Customer ID':1001,'Full Name':'John Smith','Email':'john@email.com','Phone':'+1-555-0101'},
+        {'Customer ID':1002,'Full Name':'Sarah Johnson','Email':'sarah@email.com','Phone':'+1-555-0102'}
+    ];
+    if(pt)Store.enteredData[pt.id]=[
+        {'Product ID':2001,'Product Name':'Laptop','Price':999.99,'Stock':50},
+        {'Product ID':2002,'Product Name':'Mouse','Price':29.99,'Stock':200}
+    ];
+    if(ot)Store.enteredData[ot.id]=[
+        {'Order ID':3001,'Order Date':'2024-06-01','Total':1029.98,'Status':'Completed'},
+        {'Order ID':3002,'Order Date':'2024-06-05','Total':29.99,'Status':'Shipped'}
+    ];
+}
+
+function getSQLType(t){var m={'Text':'VARCHAR(255)','Long Text':'TEXT','Number':'INT','Decimal':'FLOAT','Email':'VARCHAR(255)','Password':'VARCHAR(255)','Date':'DATE','Boolean':'BOOLEAN'};return m[t]||'VARCHAR(255)'}
+function toSnake(s){return s.replace(/\s+/g,'_').toLowerCase()}
+
+function genSQL(m){
+    if(!m)return'';var sql='';
+    var order=getTableOrder(m);
+    for(var i=0;i<order.length;i++){
+        var t=order[i];
+        sql+='CREATE TABLE '+toSnake(t.name)+' (\n';
+        var defs=[];
+        for(var j=0;j<t.fields.length;j++){
+            var f=t.fields[j];
+            var d='    '+toSnake(f.name)+' '+getSQLType(f.type);
+            if(f.isPrimaryKey)d+=' PRIMARY KEY';
+            else if(f.isRequired)d+=' NOT NULL';
+            if(f.isUnique&&!f.isPrimaryKey)d+=' UNIQUE';
+            defs.push(d);
         }
-
-        function generateNumericId() {
-            return Math.floor(Math.random() * 900000) + 100000;
-        }
-
-        function deepClone(obj) {
-            return JSON.parse(JSON.stringify(obj));
-        }
-
-        // ============================================
-        // INITIALIZE DEMO DATA
-        // ============================================
-        function createDemoModel() {
-            const model = {
-                id: generateId(),
-                name: 'E-Commerce Demo',
-                description: 'Sample e-commerce data model with customers, orders, and products',
-                tables: [],
-                relationships: []
-            };
-
-            // Customers table
-            const customersTable = {
-                id: generateId(),
-                name: 'Customers',
-                isJunction: false,
-                position: { x: 50, y: 50 },
-                fields: [
-                    { id: generateId(), name: 'Customer ID', type: 'Number', isPrimaryKey: true, isRequired: true, isUnique: true },
-                    { id: generateId(), name: 'Full Name', type: 'Text', isPrimaryKey: false, isRequired: true, isUnique: false },
-                    { id: generateId(), name: 'Email', type: 'Email', isPrimaryKey: false, isRequired: true, isUnique: true },
-                    { id: generateId(), name: 'Phone', type: 'Text', isPrimaryKey: false, isRequired: false, isUnique: false },
-                    { id: generateId(), name: 'Registration Date', type: 'Date', isPrimaryKey: false, isRequired: true, isUnique: false }
-                ]
-            };
-
-            // Products table
-            const productsTable = {
-                id: generateId(),
-                name: 'Products',
-                isJunction: false,
-                position: { x: 450, y: 50 },
-                fields: [
-                    { id: generateId(), name: 'Product ID', type: 'Number', isPrimaryKey: true, isRequired: true, isUnique: true },
-                    { id: generateId(), name: 'Product Name', type: 'Text', isPrimaryKey: false, isRequired: true, isUnique: false },
-                    { id: generateId(), name: 'Description', type: 'Long Text', isPrimaryKey: false, isRequired: false, isUnique: false },
-                    { id: generateId(), name: 'Price', type: 'Decimal', isPrimaryKey: false, isRequired: true, isUnique: false },
-                    { id: generateId(), name: 'Stock Quantity', type: 'Number', isPrimaryKey: false, isRequired: true, isUnique: false },
-                    { id: generateId(), name: 'Active', type: 'Boolean', isPrimaryKey: false, isRequired: true, isUnique: false }
-                ]
-            };
-
-            // Orders table
-            const ordersTable = {
-                id: generateId(),
-                name: 'Orders',
-                isJunction: false,
-                position: { x: 50, y: 280 },
-                fields: [
-                    { id: generateId(), name: 'Order ID', type: 'Number', isPrimaryKey: true, isRequired: true, isUnique: true },
-                    { id: generateId(), name: 'Order Date', type: 'Date', isPrimaryKey: false, isRequired: true, isUnique: false },
-                    { id: generateId(), name: 'Total Amount', type: 'Decimal', isPrimaryKey: false, isRequired: true, isUnique: false },
-                    { id: generateId(), name: 'Status', type: 'Text', isPrimaryKey: false, isRequired: true, isUnique: false }
-                ]
-            };
-
-            // Orders_Products junction table
-            const orderProductsTable = {
-                id: generateId(),
-                name: 'Orders_Products',
-                isJunction: true,
-                position: { x: 280, y: 280 },
-                fields: [
-                    { id: generateId(), name: 'Line Item ID', type: 'Number', isPrimaryKey: true, isRequired: true, isUnique: true },
-                    { id: generateId(), name: 'Quantity', type: 'Number', isPrimaryKey: false, isRequired: true, isUnique: false },
-                    { id: generateId(), name: 'Unit Price', type: 'Decimal', isPrimaryKey: false, isRequired: true, isUnique: false },
-                    { id: generateId(), name: 'Discount', type: 'Decimal', isPrimaryKey: false, isRequired: false, isUnique: false }
-                ]
-            };
-
-            model.tables = [customersTable, productsTable, ordersTable, orderProductsTable];
-
-            // Relationships
-            model.relationships = [
-                {
-                    id: generateId(),
-                    fromTable: customersTable.id,
-                    toTable: ordersTable.id,
-                    type: 'one-to-many',
-                    fromField: customersTable.fields[0].id,
-                    toField: null
-                },
-                {
-                    id: generateId(),
-                    fromTable: ordersTable.id,
-                    toTable: orderProductsTable.id,
-                    type: 'one-to-many',
-                    fromField: ordersTable.fields[0].id,
-                    toField: null
-                },
-                {
-                    id: generateId(),
-                    fromTable: productsTable.id,
-                    toTable: orderProductsTable.id,
-                    type: 'one-to-many',
-                    fromField: productsTable.fields[0].id,
-                    toField: null
+        for(var r=0;r<m.relationships.length;r++){
+            var rel=m.relationships[r];
+            if(rel.toTable===t.id){
+                var ft=m.tables.find(function(x){return x.id===rel.fromTable});
+                if(ft){
+                    var pk=ft.fields.find(function(x){return x.isPrimaryKey});
+                    defs.push('    '+toSnake(ft.name)+'_id INT NOT NULL');
+                    defs.push('    FOREIGN KEY ('+toSnake(ft.name)+'_id) REFERENCES '+toSnake(ft.name)+'('+toSnake(pk?pk.name:'id')+')');
                 }
-            ];
-
-            return model;
-        }
-
-        function createDemoData() {
-            const model = Store.currentModel;
-            if (!model) return;
-
-            const customersTable = model.tables.find(t => t.name === 'Customers');
-            const productsTable = model.tables.find(t => t.name === 'Products');
-            const ordersTable = model.tables.find(t => t.name === 'Orders');
-            const orderProductsTable = model.tables.find(t => t.name === 'Orders_Products');
-
-            // Sample Customers
-            Store.enteredData[customersTable.id] = [
-                { 'Customer ID': 1001, 'Full Name': 'John Smith', 'Email': 'john.smith@email.com', 'Phone': '+1-555-0101', 'Registration Date': '2024-01-15' },
-                { 'Customer ID': 1002, 'Full Name': 'Sarah Johnson', 'Email': 'sarah.j@email.com', 'Phone': '+1-555-0102', 'Registration Date': '2024-02-20' },
-                { 'Customer ID': 1003, 'Full Name': 'Michael Brown', 'Email': 'mbrown@email.com', 'Phone': '+1-555-0103', 'Registration Date': '2024-03-10' },
-                { 'Customer ID': 1004, 'Full Name': 'Emily Davis', 'Email': 'emily.d@email.com', 'Phone': '', 'Registration Date': '2024-03-25' },
-                { 'Customer ID': 1005, 'Full Name': 'Robert Wilson', 'Email': 'rwilson@email.com', 'Phone': '+1-555-0105', 'Registration Date': '2024-04-05' }
-            ];
-
-            // Sample Products
-            Store.enteredData[productsTable.id] = [
-                { 'Product ID': 2001, 'Product Name': 'Wireless Headphones', 'Description': 'Premium noise-canceling headphones', 'Price': 149.99, 'Stock Quantity': 50, 'Active': true },
-                { 'Product ID': 2002, 'Product Name': 'USB-C Cable', 'Description': 'High-speed charging cable 2m', 'Price': 19.99, 'Stock Quantity': 200, 'Active': true },
-                { 'Product ID': 2003, 'Product Name': 'Laptop Stand', 'Description': 'Adjustable aluminum stand', 'Price': 79.99, 'Stock Quantity': 30, 'Active': true },
-                { 'Product ID': 2004, 'Product Name': 'Wireless Mouse', 'Description': 'Ergonomic wireless mouse', 'Price': 39.99, 'Stock Quantity': 75, 'Active': true },
-                { 'Product ID': 2005, 'Product Name': 'Webcam HD', 'Description': '1080p webcam with microphone', 'Price': 89.99, 'Stock Quantity': 25, 'Active': true },
-                { 'Product ID': 2006, 'Product Name': 'Mechanical Keyboard', 'Description': 'RGB mechanical gaming keyboard', 'Price': 129.99, 'Stock Quantity': 0, 'Active': false }
-            ];
-
-            // Sample Orders
-            Store.enteredData[ordersTable.id] = [
-                { 'Order ID': 3001, 'Customer ID': 1001, 'Order Date': '2024-06-01', 'Total Amount': 189.98, 'Status': 'Completed' },
-                { 'Order ID': 3002, 'Customer ID': 1002, 'Order Date': '2024-06-05', 'Total Amount': 149.99, 'Status': 'Completed' },
-                { 'Order ID': 3003, 'Customer ID': 1001, 'Order Date': '2024-06-10', 'Total Amount': 259.97, 'Status': 'Completed' },
-                { 'Order ID': 3004, 'Customer ID': 1003, 'Order Date': '2024-06-15', 'Total Amount': 79.99, 'Status': 'Shipped' },
-                { 'Order ID': 3005, 'Customer ID': 1004, 'Order Date': '2024-06-20', 'Total Amount': 169.98, 'Status': 'Processing' },
-                { 'Order ID': 3006, 'Customer ID': 1002, 'Order Date': '2024-06-22', 'Total Amount': 219.98, 'Status': 'Pending' },
-                { 'Order ID': 3007, 'Customer ID': 1005, 'Order Date': '2024-06-25', 'Total Amount': 89.99, 'Status': 'Completed' }
-            ];
-
-            // Sample Order Products (junction)
-            Store.enteredData[orderProductsTable.id] = [
-                { 'Line Item ID': 4001, 'Order ID': 3001, 'Product ID': 2001, 'Quantity': 1, 'Unit Price': 149.99, 'Discount': 0 },
-                { 'Line Item ID': 4002, 'Order ID': 3001, 'Product ID': 2002, 'Quantity': 2, 'Unit Price': 19.99, 'Discount': 0 },
-                { 'Line Item ID': 4003, 'Order ID': 3002, 'Product ID': 2001, 'Quantity': 1, 'Unit Price': 149.99, 'Discount': 0 },
-                { 'Line Item ID': 4004, 'Order ID': 3003, 'Product ID': 2003, 'Quantity': 1, 'Unit Price': 79.99, 'Discount': 0 },
-                { 'Line Item ID': 4005, 'Order ID': 3003, 'Product ID': 2004, 'Quantity': 2, 'Unit Price': 39.99, 'Discount': 5 },
-                { 'Line Item ID': 4006, 'Order ID': 3003, 'Product ID': 2005, 'Quantity': 1, 'Unit Price': 89.99, 'Discount': 10 },
-                { 'Line Item ID': 4007, 'Order ID': 3004, 'Product ID': 2003, 'Quantity': 1, 'Unit Price': 79.99, 'Discount': 0 },
-                { 'Line Item ID': 4008, 'Order ID': 3005, 'Product ID': 2001, 'Quantity': 1, 'Unit Price': 149.99, 'Discount': 0 },
-                { 'Line Item ID': 4009, 'Order ID': 3005, 'Product ID': 2002, 'Quantity': 1, 'Unit Price': 19.99, 'Discount': 0 },
-                { 'Line Item ID': 4010, 'Order ID': 3006, 'Product ID': 2006, 'Quantity': 1, 'Unit Price': 129.99, 'Discount': 0 },
-                { 'Line Item ID': 4011, 'Order ID': 3006, 'Product ID': 2005, 'Quantity': 1, 'Unit Price': 89.99, 'Discount': 0 },
-                { 'Line Item ID': 4012, 'Order ID': 3007, 'Product ID': 2005, 'Quantity': 1, 'Unit Price': 89.99, 'Discount': 0 }
-            ];
-        }
-
-        // ============================================
-        // SQL GENERATOR
-        // ============================================
-        function getFieldTypeSQL(type) {
-            const mapping = {
-                'Text': 'VARCHAR(255)',
-                'Long Text': 'TEXT',
-                'Number': 'INT',
-                'Decimal': 'FLOAT',
-                'Email': 'VARCHAR(255)',
-                'Password': 'VARCHAR(255)',
-                'Date': 'DATE',
-                'Boolean': 'BOOLEAN'
-            };
-            return mapping[type] || 'VARCHAR(255)';
-        }
-
-        function toSnakeCase(str) {
-            return str.replace(/\s+/g, '_').toLowerCase();
-        }
-
-        function generateSQL(model) {
-            if (!model) return '';
-
-            let sql = '';
-            const tableOrder = getTableCreationOrder(model);
-
-            // Generate CREATE TABLE statements
-            tableOrder.forEach(table => {
-                sql += `CREATE TABLE ${toSnakeCase(table.name)} (\n`;
-
-                const fieldDefs = [];
-
-                // Regular fields
-                table.fields.forEach(field => {
-                    let def = `    ${toSnakeCase(field.name)} ${getFieldTypeSQL(field.type)}`;
-                    if (field.isPrimaryKey) def += ' PRIMARY KEY';
-                    else if (field.isRequired) def += ' NOT NULL';
-                    if (field.isUnique && !field.isPrimaryKey) def += ' UNIQUE';
-                    fieldDefs.push(def);
-                });
-
-                // Foreign key fields
-                const incomingRels = model.relationships.filter(r => r.toTable === table.id);
-                incomingRels.forEach(rel => {
-                    const fromTable = model.tables.find(t => t.id === rel.fromTable);
-                    if (fromTable) {
-                        const fkName = toSnakeCase(fromTable.name) + '_id';
-                        fieldDefs.push(`    ${fkName} INT NOT NULL`);
-                        fieldDefs.push(`    FOREIGN KEY (${fkName}) REFERENCES ${toSnakeCase(fromTable.name)}(${toSnakeCase(fromTable.fields.find(f => f.isPrimaryKey)?.name || 'id')})`);
-                    }
-                });
-
-                sql += fieldDefs.join(',\n');
-                sql += '\n);\n\n';
-            });
-
-            return sql;
-        }
-
-        function getTableCreationOrder(model) {
-            // Topological sort based on relationships
-            const tables = [...model.tables];
-            const visited = new Set();
-            const order = [];
-
-            function visit(table) {
-                if (visited.has(table.id)) return;
-                visited.add(table.id);
-
-                // Visit dependencies first (tables this table references)
-                const deps = model.relationships
-                    .filter(r => r.toTable === table.id)
-                    .map(r => model.tables.find(t => t.id === r.fromTable))
-                    .filter(Boolean);
-
-                deps.forEach(visit);
-                order.push(table);
-            }
-
-            tables.forEach(visit);
-            return order;
-        }
-
-        // ============================================
-        // RENDER FUNCTIONS
-        // ============================================
-        function render() {
-            const app = document.getElementById('app');
-            
-            switch (Store.currentScreen) {
-                case 'home':
-                    app.innerHTML = renderHomeScreen();
-                    break;
-                case 'pages':
-                    app.innerHTML = renderPagesScreen();
-                    break;
-                case 'data-models':
-                    app.innerHTML = renderDataModelsScreen();
-                    break;
-                case 'designer':
-                    app.innerHTML = renderDesignerScreen();
-                    initERDiagram();
-                    break;
-                case 'data-entry':
-                    app.innerHTML = renderDataEntryScreen();
-                    break;
-                case 'data-entry-form':
-                    app.innerHTML = renderDataEntryFormScreen();
-                    break;
-                case 'reports':
-                    app.innerHTML = renderReportsScreen();
-                    initCharts();
-                    break;
             }
         }
+        sql+=defs.join(',\n')+'\n);\n\n';
+    }
+    return sql;
+}
 
-        function renderHeader(breadcrumbs = []) {
-            return `
-                <header class="header">
-                    <div class="breadcrumb">
-                        <span onclick="navigateTo('home')">Form Builder v4</span>
-                        ${breadcrumbs.map(b => `
-                            <span class="separator">/</span>
-                            <span onclick="${b.action}">${b.label}</span>
-                        `).join('')}
-                    </div>
-                    <div class="header-nav">
-                        ${Store.currentModel ? `
-                            <button class="btn btn-secondary btn-sm" onclick="navigateTo('data-entry')">Data Entry</button>
-                            <button class="btn btn-secondary btn-sm" onclick="navigateTo('reports')">Reports</button>
-                        ` : ''}
-                    </div>
-                </header>
-            `;
-        }
-
-        function renderHomeScreen() {
-            return `
-                ${renderHeader()}
-                <main class="main-content">
-                    <div class="home-screen">
-                        <h1 class="home-title">Form Builder v4</h1>
-                        <p class="home-subtitle">A no-code database designer, data entry simulator, and reporting engine for non-technical users.</p>
-                        <div class="home-actions">
-                            <div class="home-card" onclick="navigateTo('pages')">
-                                <h3>Pages</h3>
-                                <p>View application pages</p>
-                            </div>
-                            <div class="home-card" onclick="navigateTo('data-models')">
-                                <h3>Data Models</h3>
-                                <p>Design relational databases</p>
-                            </div>
-                        </div>
-                    </div>
-                </main>
-            `;
-        }
-
-        function renderPagesScreen() {
-            const pages = [
-                { name: 'Home', type: 'Public' },
-                { name: 'Login', type: 'Authentication' },
-                { name: 'Registration', type: 'Authentication' },
-                { name: 'Profile', type: 'Protected' },
-                { name: 'Dashboard', type: 'Protected' }
-            ];
-
-            return `
-                ${renderHeader([{ label: 'Pages', action: "navigateTo('pages')" }])}
-                <main class="main-content">
-                    <h2 style="margin-bottom: 24px;">Application Pages</h2>
-                    <div class="pages-list">
-                        ${pages.map(p => `
-                            <div class="page-item">
-                                <span>${p.name}</span>
-                                <span class="page-badge">${p.type}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </main>
-            `;
-        }
-
-        function renderDataModelsScreen() {
-            return `
-                ${renderHeader([{ label: 'Data Models', action: "navigateTo('data-models')" }])}
-                <main class="main-content">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2>Data Models</h2>
-                        <button class="btn btn-primary" onclick="createNewModel()">Create Data Model</button>
-                    </div>
-                    <div class="data-models-grid">
-                        ${Store.dataModels.map(model => `
-                            <div class="model-card" onclick="openModel('${model.id}')">
-                                <h3>${model.name}</h3>
-                                <p>${model.description || 'No description'}</p>
-                                <div class="model-card-meta">
-                                    <span>${model.tables.length} tables</span>
-                                    <span>${model.relationships.length} relationships</span>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </main>
-            `;
-        }
-
-        function renderDesignerScreen() {
-            const model = Store.currentModel;
-            if (!model) return '';
-
-            return `
-                ${renderHeader([
-                    { label: 'Data Models', action: "navigateTo('data-models')" },
-                    { label: model.name, action: "" }
-                ])}
-                <main class="main-content">
-                    <div class="designer-layout">
-                        ${renderTablesSidebar()}
-                        ${renderERCanvas()}
-                        ${renderPropertiesPanel()}
-                    </div>
-                </main>
-                ${renderModals()}
-            `;
-        }
-
-        function renderTablesSidebar() {
-            const model = Store.currentModel;
-            return `
-                <aside class="designer-sidebar">
-                    <div class="sidebar-header">
-                        <span class="sidebar-title">Tables</span>
-                        <button class="btn btn-primary btn-sm" onclick="showAddTableModal()">Add Table</button>
-                    </div>
-                    <div class="sidebar-content">
-                        ${model.tables.length === 0 ? `
-                            <div class="empty-state">
-                                <p>No tables yet. Add your first table to get started.</p>
-                            </div>
-                        ` : model.tables.map(table => `
-                            <div class="table-list-item ${table.isJunction ? 'junction' : ''} ${Store.selectedTable?.id === table.id ? 'active' : ''}" 
-                                 onclick="selectTable('${table.id}')">
-                                <h4>${table.name} ${table.isJunction ? '<span class="tag tag-purple">Junction</span>' : ''}</h4>
-                                <p>${table.fields.length} fields</p>
-                            </div>
-                        `).join('')}
-                    </div>
-                </aside>
-            `;
-        }
-
-        function renderERCanvas() {
-            return `
-                <div class="designer-canvas">
-                    <div class="canvas-toolbar">
-                        <button class="btn btn-secondary btn-sm" onclick="showAddRelationshipModal()">Add Relationship</button>
-                        <button class="btn btn-secondary btn-sm" onclick="showSQLPreviewModal()">View SQL</button>
-                    </div>
-                    <div class="er-canvas" id="erCanvas">
-                        <!-- ER diagram will be rendered here -->
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderPropertiesPanel() {
-            const table = Store.selectedTable;
-
-            return `
-                <aside class="designer-panel">
-                    <div class="panel-tabs">
-                        <button class="panel-tab active" data-tab="fields" onclick="switchPanelTab('fields')">Fields</button>
-                        <button class="panel-tab" data-tab="relationships" onclick="switchPanelTab('relationships')">Relationships</button>
-                    </div>
-                    <div class="panel-content" id="panelContent">
-                        ${table ? renderFieldsPanel(table) : `
-                            <div class="empty-state">
-                                <p>Select a table to view its properties</p>
-                            </div>
-                        `}
-                    </div>
-                </aside>
-            `;
-        }
-
-        function renderFieldsPanel(table) {
-            return `
-                <div class="inline-form" style="margin-bottom: 16px;">
-                    <input type="text" class="form-input" id="tableNameInput" value="${table.name}" 
-                           onchange="updateTableName('${table.id}', this.value)">
-                    <button class="btn btn-danger btn-sm" onclick="deleteTable('${table.id}')">Delete</button>
-                </div>
-                <div class="form-checkbox" style="margin-bottom: 16px;">
-                    <input type="checkbox" id="isJunctionCheck" ${table.isJunction ? 'checked' : ''} 
-                           onchange="toggleJunction('${table.id}', this.checked)">
-                    <label for="isJunctionCheck">Junction Table</label>
-                </div>
-                <div class="divider"></div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <span class="section-title" style="margin-bottom: 0;">Fields</span>
-                    <button class="btn btn-secondary btn-sm" onclick="showAddFieldModal('${table.id}')">Add Field</button>
-                </div>
-                <div class="field-list">
-                    ${table.fields.map(field => `
-                        <div class="field-item">
-                            <div class="field-item-header">
-                                <span class="field-item-name">${field.name}</span>
-                                <div class="field-item-actions">
-                                    <button class="btn btn-secondary btn-sm btn-icon" onclick="showEditFieldModal('${table.id}', '${field.id}')">E</button>
-                                    <button class="btn btn-danger btn-sm btn-icon" onclick="deleteField('${table.id}', '${field.id}')">X</button>
-                                </div>
-                            </div>
-                            <div class="field-item-meta">
-                                <span>${field.type}</span>
-                                ${field.isPrimaryKey ? '<span style="color: var(--accent-warning)">Unique ID</span>' : ''}
-                                ${field.isRequired ? '<span style="color: var(--accent-danger)">Required</span>' : ''}
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function renderRelationshipsPanel() {
-            const model = Store.currentModel;
-            return `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <span class="section-title" style="margin-bottom: 0;">Relationships</span>
-                    <button class="btn btn-secondary btn-sm" onclick="showAddRelationshipModal()">Add</button>
-                </div>
-                ${model.relationships.length === 0 ? `
-                    <div class="empty-state">
-                        <p>No relationships defined</p>
-                    </div>
-                ` : model.relationships.map(rel => {
-                    const fromTable = model.tables.find(t => t.id === rel.fromTable);
-                    const toTable = model.tables.find(t => t.id === rel.toTable);
-                    const typeLabel = rel.type === 'one-to-one' ? 'One matches One' : 
-                                     rel.type === 'one-to-many' ? 'One matches Many' : 'Many match Many';
-                    return `
-                        <div class="relationship-item">
-                            <div class="relationship-visual">
-                                <span class="relationship-table">${fromTable?.name || 'Unknown'}</span>
-                                <span class="relationship-arrow">→</span>
-                                <span class="relationship-table">${toTable?.name || 'Unknown'}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span class="relationship-type">${typeLabel}</span>
-                                <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRelationship('${rel.id}')">X</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
-            `;
-        }
-
-        function renderModals() {
-            return `
-                <div id="modalContainer"></div>
-            `;
-        }
-
-        // ============================================
-        // DATA ENTRY SCREENS
-        // ============================================
-        function renderDataEntryScreen() {
-            const model = Store.currentModel;
-            if (!model) return '';
-
-            return `
-                ${renderHeader([
-                    { label: 'Data Models', action: "navigateTo('data-models')" },
-                    { label: model.name, action: "navigateTo('designer')" },
-                    { label: 'Data Entry', action: "" }
-                ])}
-                <main class="main-content">
-                    <h2 style="text-align: center; margin-bottom: 16px;">Select Entry Mode</h2>
-                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 32px;">Choose how you want to enter data into the system</p>
-                    
-                    <div class="data-entry-modes">
-                        <div class="mode-card ${Store.entryMode === 'single' ? 'selected' : ''}" onclick="selectEntryMode('single')">
-                            <h3>Single Table Entry</h3>
-                            <p>Enter data into one table at a time. No relationship enforcement.</p>
-                        </div>
-                        <div class="mode-card ${Store.entryMode === 'multi' ? 'selected' : ''}" onclick="selectEntryMode('multi')">
-                            <h3>Multi-Table Entry</h3>
-                            <p>Enter data into multiple related tables. Relationships enforced between selected tables.</p>
-                        </div>
-                        <div class="mode-card ${Store.entryMode === 'flow' ? 'selected' : ''}" onclick="selectEntryMode('flow')">
-                            <h3>Full Relational Flow</h3>
-                            <p>Enter data following the complete relationship chain. All parent tables included.</p>
-                        </div>
-                    </div>
-
-                    ${Store.entryMode ? renderTableSelection() : ''}
-                </main>
-            `;
-        }
-
-        function renderTableSelection() {
-            const model = Store.currentModel;
-            
-            if (Store.entryMode === 'flow') {
-                // For flow mode, auto-select based on hierarchy
-                return `
-                    <div style="max-width: 600px; margin: 32px auto; text-align: center;">
-                        <h3 style="margin-bottom: 16px;">Full Relational Flow</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 24px;">
-                            Data will be entered following the complete relationship chain.
-                            All tables will be included automatically.
-                        </p>
-                        <button class="btn btn-primary" onclick="startDataEntry()">Start Entry</button>
-                    </div>
-                `;
-            }
-
-            return `
-                <div style="max-width: 600px; margin: 32px auto;">
-                    <h3 style="margin-bottom: 16px; text-align: center;">Select Tables</h3>
-                    <div class="table-selector" style="justify-content: center;">
-                        ${model.tables.map(table => `
-                            <span class="table-chip ${Store.selectedTables.includes(table.id) ? 'selected' : ''}" 
-                                  onclick="toggleTableSelection('${table.id}')">
-                                ${table.name}
-                                ${table.isJunction ? ' (Junction)' : ''}
-                            </span>
-                        `).join('')}
-                    </div>
-                    ${Store.selectedTables.length > 0 ? `
-                        <div style="text-align: center; margin-top: 24px;">
-                            <button class="btn btn-primary" onclick="startDataEntry()">Continue</button>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-
-        function renderDataEntryFormScreen() {
-            const model = Store.currentModel;
-            if (!model) return '';
-
-            const tablesToShow = getEntryTables();
-
-            return `
-                ${renderHeader([
-                    { label: 'Data Models', action: "navigateTo('data-models')" },
-                    { label: model.name, action: "navigateTo('designer')" },
-                    { label: 'Data Entry', action: "navigateTo('data-entry')" },
-                    { label: 'Form', action: "" }
-                ])}
-                <main class="main-content">
-                    <form class="data-form" id="dataEntryForm" onsubmit="submitDataEntry(event)">
-                        ${renderDataFormSections(tablesToShow)}
-                        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 24px;">
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('data-entry')">Cancel</button>
-                            <button type="submit" class="btn btn-success">Submit Data</button>
-                        </div>
-                    </form>
-                    <div id="dataFlowViz"></div>
-                </main>
-            `;
-        }
-
-        function getEntryTables() {
-            const model = Store.currentModel;
-            
-            if (Store.entryMode === 'flow') {
-                return getTableCreationOrder(model);
-            }
-            
-            return Store.selectedTables.map(id => model.tables.find(t => t.id === id)).filter(Boolean);
-        }
-
-        function renderDataFormSections(tables) {
-            const model = Store.currentModel;
-            let html = '';
-
-            tables.forEach((table, index) => {
-                const isRepeatable = isTableRepeatable(table.id);
-                const parentTable = getParentTable(table.id);
-
-                html += `
-                    <div class="form-section" data-table-id="${table.id}">
-                        <div class="form-section-header">
-                            <span class="form-section-title">${table.name}</span>
-                            ${table.isJunction ? '<span class="tag tag-purple">Junction Table</span>' : ''}
-                        </div>
-                        <div class="form-section-body">
-                            ${isRepeatable ? `
-                                <div id="repeatable-${table.id}">
-                                    ${renderRepeatableRow(table, 0)}
-                                </div>
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="addRepeatableRow('${table.id}')">
-                                    Add Another ${table.name} Entry
-                                </button>
-                            ` : renderFormFields(table)}
-                        </div>
-                    </div>
-                `;
-            });
-
-            return html;
-        }
-
-        function renderFormFields(table, rowIndex = null) {
-            const prefix = rowIndex !== null ? `${table.id}_${rowIndex}_` : `${table.id}_`;
-            
-            return `
-                <div class="form-row">
-                    ${table.fields.filter(f => !f.isPrimaryKey).map(field => `
-                        <div class="form-group">
-                            <label class="form-label">${field.name}${field.isRequired ? ' *' : ''}</label>
-                            ${renderFieldInput(field, prefix)}
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function renderRepeatableRow(table, index) {
-            return `
-                <div class="repeatable-section" data-row-index="${index}">
-                    <div class="repeatable-header">
-                        <span class="repeatable-title">Entry ${index + 1}</span>
-                        ${index > 0 ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeRepeatableRow('${table.id}', ${index})">Remove</button>` : ''}
-                    </div>
-                    ${renderFormFields(table, index)}
-                </div>
-            `;
-        }
-
-        function renderFieldInput(field, prefix) {
-            const name = prefix + field.id;
-            const required = field.isRequired ? 'required' : '';
-
-            switch (field.type) {
-                case 'Long Text':
-                    return `<textarea class="form-textarea" name="${name}" ${required}></textarea>`;
-                case 'Number':
-                    return `<input type="number" class="form-input" name="${name}" ${required}>`;
-                case 'Decimal':
-                    return `<input type="number" step="0.01" class="form-input" name="${name}" ${required}>`;
-                case 'Email':
-                    return `<input type="email" class="form-input" name="${name}" ${required}>`;
-                case 'Password':
-                    return `<input type="password" class="form-input" name="${name}" ${required}>`;
-                case 'Date':
-                    return `<input type="date" class="form-input" name="${name}" ${required}>`;
-                case 'Boolean':
-                    return `
-                        <select class="form-select" name="${name}" ${required}>
-                            <option value="">Select...</option>
-                            <option value="true">Yes</option>
-                            <option value="false">No</option>
-                        </select>
-                    `;
-                default:
-                    return `<input type="text" class="form-input" name="${name}" ${required}>`;
+function getTableOrder(m){
+    var visited={},order=[];
+    function visit(t){
+        if(visited[t.id])return;visited[t.id]=true;
+        for(var i=0;i<m.relationships.length;i++){
+            var r=m.relationships[i];
+            if(r.toTable===t.id){
+                var ft=m.tables.find(function(x){return x.id===r.fromTable});
+                if(ft)visit(ft);
             }
         }
-
-        function isTableRepeatable(tableId) {
-            const model = Store.currentModel;
-            // A table is repeatable if it's on the "many" side of a 1:N relationship
-            return model.relationships.some(r => r.toTable === tableId && r.type === 'one-to-many');
-        }
-
-        function getParentTable(tableId) {
-            const model = Store.currentModel;
-            const rel = model.relationships.find(r => r.toTable === tableId);
-            return rel ? model.tables.find(t => t.id === rel.fromTable) : null;
-        }
-
-        // ============================================
-        // REPORTS SCREEN
-        // ============================================
-        function renderReportsScreen() {
-            const model = Store.currentModel;
-            if (!model) return '';
-
-            return `
-                ${renderHeader([
-                    { label: 'Data Models', action: "navigateTo('data-models')" },
-                    { label: model.name, action: "navigateTo('designer')" },
-                    { label: 'Reports', action: "" }
-                ])}
-                <main class="main-content">
-                    <div class="report-builder">
-                        ${renderReportConfig()}
-                        ${renderReportPreview()}
-                    </div>
-                </main>
-            `;
-        }
-
-        function renderReportConfig() {
-            const model = Store.currentModel;
-
-            return `
-                <aside class="report-config">
-                    <div class="sidebar-header">
-                        <span class="sidebar-title">Report Configuration</span>
-                    </div>
-                    <div class="sidebar-content scrollable">
-                        <div class="form-group">
-                            <label class="form-label">Select Fields</label>
-                            <div class="field-selector">
-                                ${model.tables.map(table => 
-                                    table.fields.map(field => `
-                                        <label class="field-option">
-                                            <input type="checkbox" 
-                                                   ${Store.reportConfig.selectedFields.includes(`${table.id}.${field.id}`) ? 'checked' : ''}
-                                                   onchange="toggleReportField('${table.id}', '${field.id}')">
-                                            <span>${field.name}</span>
-                                            <span class="table-name">${table.name}</span>
-                                        </label>
-                                    `).join('')
-                                ).join('')}
-                            </div>
-                        </div>
-
-                        <div class="divider"></div>
-
-                        <div class="form-group">
-                            <label class="form-label">Presentation</label>
-                            <div style="display: flex; flex-direction: column; gap: 8px;">
-                                <label class="form-checkbox">
-                                    <input type="checkbox" ${Store.reportConfig.showChart ? 'checked' : ''} 
-                                           onchange="Store.reportConfig.showChart = this.checked; render();">
-                                    Show Chart
-                                </label>
-                                <label class="form-checkbox">
-                                    <input type="checkbox" ${Store.reportConfig.showStats ? 'checked' : ''} 
-                                           onchange="Store.reportConfig.showStats = this.checked; render();">
-                                    Show Statistics
-                                </label>
-                                <label class="form-checkbox">
-                                    <input type="checkbox" ${Store.reportConfig.showTable ? 'checked' : ''} 
-                                           onchange="Store.reportConfig.showTable = this.checked; render();">
-                                    Show Table
-                                </label>
-                            </div>
-                        </div>
-
-                        ${Store.reportConfig.showChart ? `
-                            <div class="form-group">
-                                <label class="form-label">Chart Type</label>
-                                <select class="form-select" onchange="Store.reportConfig.chartType = this.value; render();">
-                                    <option value="bar" ${Store.reportConfig.chartType === 'bar' ? 'selected' : ''}>Bar Chart</option>
-                                    <option value="line" ${Store.reportConfig.chartType === 'line' ? 'selected' : ''}>Line Chart</option>
-                                    <option value="doughnut" ${Store.reportConfig.chartType === 'doughnut' ? 'selected' : ''}>Donut Chart</option>
-                                </select>
-                            </div>
-                        ` : ''}
-
-                        <div class="divider"></div>
-
-                        <div class="form-group">
-                            <label class="form-label">Aggregations (Optional)</label>
-                            <div class="aggregation-options">
-                                ${getNumericSelectedFields().map(f => `
-                                    <div class="agg-row">
-                                        <span class="agg-field">${f.fieldName}</span>
-                                        <select class="form-select" style="width: 100px;" 
-                                                onchange="setAggregation('${f.key}', this.value)">
-                                            <option value="" ${!Store.reportConfig.aggregations[f.key] ? 'selected' : ''}>None</option>
-                                            <option value="count" ${Store.reportConfig.aggregations[f.key] === 'count' ? 'selected' : ''}>Count</option>
-                                            <option value="sum" ${Store.reportConfig.aggregations[f.key] === 'sum' ? 'selected' : ''}>Sum</option>
-                                            <option value="avg" ${Store.reportConfig.aggregations[f.key] === 'avg' ? 'selected' : ''}>Average</option>
-                                        </select>
-                                    </div>
-                                `).join('')}
-                                ${getNumericSelectedFields().length === 0 ? '<p style="font-size: 12px; color: var(--text-muted);">Select numeric fields to enable aggregations</p>' : ''}
-                            </div>
-                        </div>
-
-                        <div class="divider"></div>
-
-                        <div class="form-group">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <label class="form-label" style="margin-bottom: 0;">Filters</label>
-                                <button class="btn btn-secondary btn-sm" onclick="addFilter()">Add Filter</button>
-                            </div>
-                            <div class="filter-builder" id="filterBuilder">
-                                ${Store.reportConfig.filters.map((filter, i) => renderFilterRow(filter, i)).join('')}
-                            </div>
-                        </div>
-                    </div>
-                </aside>
-            `;
-        }
-
-        function renderFilterRow(filter, index) {
-            const model = Store.currentModel;
-            const allFields = [];
-            model.tables.forEach(t => {
-                t.fields.forEach(f => {
-                    allFields.push({ key: `${t.id}.${f.id}`, label: `${t.name}: ${f.name}`, type: f.type });
-                });
-            });
-
-            return `
-                <div class="filter-row">
-                    <select class="form-select" onchange="updateFilter(${index}, 'field', this.value)">
-                        <option value="">Select Field</option>
-                        ${allFields.map(f => `
-                            <option value="${f.key}" ${filter.field === f.key ? 'selected' : ''}>${f.label}</option>
-                        `).join('')}
-                    </select>
-                    <select class="form-select" onchange="updateFilter(${index}, 'operator', this.value)">
-                        <option value="eq" ${filter.operator === 'eq' ? 'selected' : ''}>Equals</option>
-                        <option value="neq" ${filter.operator === 'neq' ? 'selected' : ''}>Not Equals</option>
-                        <option value="gt" ${filter.operator === 'gt' ? 'selected' : ''}>Greater Than</option>
-                        <option value="lt" ${filter.operator === 'lt' ? 'selected' : ''}>Less Than</option>
-                        <option value="null" ${filter.operator === 'null' ? 'selected' : ''}>Is Null</option>
-                        <option value="notnull" ${filter.operator === 'notnull' ? 'selected' : ''}>Is Not Null</option>
-                    </select>
-                    <input type="text" class="form-input" value="${filter.value || ''}" 
-                           onchange="updateFilter(${index}, 'value', this.value)"
-                           ${['null', 'notnull'].includes(filter.operator) ? 'disabled' : ''}>
-                    <button class="btn btn-danger btn-sm btn-icon" onclick="removeFilter(${index})">X</button>
-                </div>
-            `;
-        }
-
-        function renderReportPreview() {
-            if (Store.reportConfig.selectedFields.length === 0) {
-                return `
-                    <div class="report-preview">
-                        <div class="empty-state">
-                            <h3>Select Fields to Generate Report</h3>
-                            <p>Choose at least one field from the configuration panel to see your report.</p>
-                        </div>
-                    </div>
-                `;
-            }
-
-            const data = getReportData();
-
-            return `
-                <div class="report-preview">
-                    <h3 style="margin-bottom: 24px;">Report Preview</h3>
-                    
-                    ${Store.reportConfig.showStats ? renderStats(data) : ''}
-                    ${Store.reportConfig.showChart ? '<div class="chart-container"><canvas id="reportChart"></canvas></div>' : ''}
-                    ${Store.reportConfig.showTable ? renderDataTable(data) : ''}
-                </div>
-            `;
-        }
-
-        function renderStats(data) {
-            const stats = calculateStats(data);
-            
-            return `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">${data.length}</div>
-                        <div class="stat-label">Total Records</div>
-                    </div>
-                    ${stats.map(s => `
-                        <div class="stat-card">
-                            <div class="stat-value">${s.value}</div>
-                            <div class="stat-label">${s.label}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function renderDataTable(data) {
-            if (data.length === 0) {
-                return '<p style="color: var(--text-muted);">No data available</p>';
-            }
-
-            const headers = Object.keys(data[0]);
-
-            return `
-                <div style="overflow-x: auto;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                ${headers.map(h => `<th>${h}</th>`).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.slice(0, 50).map(row => `
-                                <tr>
-                                    ${headers.map(h => `<td>${row[h] !== undefined && row[h] !== null ? row[h] : '-'}</td>`).join('')}
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    ${data.length > 50 ? `<p style="margin-top: 12px; color: var(--text-muted); font-size: 13px;">Showing 50 of ${data.length} records</p>` : ''}
-                </div>
-            `;
-        }
-
-        // ============================================
-        // ER DIAGRAM
-        // ============================================
-        function initERDiagram() {
-            const canvas = document.getElementById('erCanvas');
-            if (!canvas) return;
-
-            const model = Store.currentModel;
-            if (!model) return;
-
-            let html = '';
-
-            // Render tables
-            model.tables.forEach(table => {
-                html += renderERTable(table);
-            });
-
-            // Render relationship lines
-            html += renderRelationshipLines();
-
-            canvas.innerHTML = html;
-
-            // Make tables draggable
-            model.tables.forEach(table => {
-                const el = document.getElementById(`erTable-${table.id}`);
-                if (el) {
-                    makeDraggable(el, table);
-                }
-            });
-        }
-
-        function renderERTable(table) {
-            const model = Store.currentModel;
-            const incomingRels = model.relationships.filter(r => r.toTable === table.id);
-
-            // Get FK fields
-            const fkFields = incomingRels.map(rel => {
-                const fromTable = model.tables.find(t => t.id === rel.fromTable);
-                return fromTable ? fromTable.name + ' ID' : null;
-            }).filter(Boolean);
-
-            return `
-                <div class="er-table ${table.isJunction ? 'junction' : ''} ${Store.selectedTable?.id === table.id ? 'selected' : ''}" 
-                     id="erTable-${table.id}"
-                     style="left: ${table.position.x}px; top: ${table.position.y}px;"
-                     onclick="selectTable('${table.id}')">
-                    <div class="er-table-header">
-                        ${table.name}
-                        ${table.isJunction ? '<span class="junction-badge">Junction</span>' : ''}
-                    </div>
-                    <div class="er-table-fields">
-                        ${table.fields.map(field => `
-                            <div class="er-field">
-                                <span class="er-field-name">${field.name}</span>
-                                <span class="er-field-type">${field.type}</span>
-                                ${field.isPrimaryKey ? '<span class="er-field-pk">PK</span>' : ''}
-                                ${field.isRequired && !field.isPrimaryKey ? '<span class="er-field-required">*</span>' : ''}
-                            </div>
-                        `).join('')}
-                        ${fkFields.map(fk => `
-                            <div class="er-field">
-                                <span class="er-field-name">${fk}</span>
-                                <span class="er-field-fk">FK</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderRelationshipLines() {
-            const model = Store.currentModel;
-            let svg = `<svg class="relationship-line" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible;">`;
-
-            model.relationships.forEach(rel => {
-                const fromTable = model.tables.find(t => t.id === rel.fromTable);
-                const toTable = model.tables.find(t => t.id === rel.toTable);
-
-                if (fromTable && toTable) {
-                    const fromX = fromTable.position.x + 100;
-                    const fromY = fromTable.position.y + 40;
-                    const toX = toTable.position.x + 100;
-                    const toY = toTable.position.y + 40;
-
-                    const midX = (fromX + toX) / 2;
-                    const midY = (fromY + toY) / 2;
-
-                    svg += `
-                        <path d="M ${fromX} ${fromY} Q ${midX} ${fromY} ${midX} ${midY} Q ${midX} ${toY} ${toX} ${toY}" 
-                              fill="none" stroke="var(--accent-primary)" stroke-width="2"/>
-                        <circle cx="${toX}" cy="${toY}" r="5" fill="var(--accent-primary)"/>
-                        <text x="${midX + 10}" y="${midY}" fill="var(--text-secondary)" font-size="11">
-                            ${rel.type === 'one-to-one' ? '1:1' : rel.type === 'one-to-many' ? '1:N' : 'N:M'}
-                        </text>
-                    `;
-                }
-            });
-
-            svg += '</svg>';
-            return svg;
-        }
-
-        function makeDraggable(el, table) {
-            let isDragging = false;
-            let startX, startY, initialX, initialY;
-
-            el.addEventListener('mousedown', (e) => {
-                if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                initialX = table.position.x;
-                initialY = table.position.y;
-                el.style.cursor = 'grabbing';
-            });
-
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                table.position.x = Math.max(0, initialX + dx);
-                table.position.y = Math.max(0, initialY + dy);
-                el.style.left = table.position.x + 'px';
-                el.style.top = table.position.y + 'px';
-                
-                // Update relationship lines
-                const canvas = document.getElementById('erCanvas');
-                const svg = canvas.querySelector('svg');
-                if (svg) {
-                    svg.outerHTML = renderRelationshipLines();
-                }
-            });
-
-            document.addEventListener('mouseup', () => {
-                isDragging = false;
-                el.style.cursor = 'move';
-            });
-        }
-
-        // ============================================
-        // CHART INITIALIZATION
-        // ============================================
-        let reportChart = null;
-
-        function initCharts() {
-            const canvas = document.getElementById('reportChart');
-            if (!canvas) return;
-
-            if (reportChart) {
-                reportChart.destroy();
-            }
-
-            const data = getReportData();
-            if (data.length === 0) return;
-
-            const chartData = prepareChartData(data);
-
-            reportChart = new Chart(canvas, {
-                type: Store.reportConfig.chartType,
-                data: chartData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#e7eaed'
-                            }
-                        }
-                    },
-                    scales: Store.reportConfig.chartType !== 'doughnut' ? {
-                        x: {
-                            ticks: { color: '#8b929a' },
-                            grid: { color: '#3d4654' }
-                        },
-                        y: {
-                            ticks: { color: '#8b929a' },
-                            grid: { color: '#3d4654' }
-                        }
-                    } : undefined
-                }
-            });
-        }
-
-        function prepareChartData(data) {
-            if (data.length === 0) return { labels: [], datasets: [] };
-
-            const keys = Object.keys(data[0]);
-            const labelKey = keys[0];
-            const valueKey = keys.find(k => {
-                const val = data[0][k];
-                return typeof val === 'number';
-            }) || keys[1];
-
-            const labels = data.slice(0, 10).map(d => String(d[labelKey] || ''));
-            const values = data.slice(0, 10).map(d => Number(d[valueKey]) || 0);
-
-            const colors = [
-                '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'
-            ];
-
-            return {
-                labels,
-                datasets: [{
-                    label: valueKey,
-                    data: values,
-                    backgroundColor: Store.reportConfig.chartType === 'doughnut' ? colors : colors[0],
-                    borderColor: Store.reportConfig.chartType === 'doughnut' ? colors : colors[0],
-                    borderWidth: 1
-                }]
-            };
-        }
-
-        // ============================================
-        // REPORT DATA FUNCTIONS
-        // ============================================
-        function getReportData() {
-            const model = Store.currentModel;
-            if (!model) return [];
-
-            const selectedFields = Store.reportConfig.selectedFields;
-            if (selectedFields.length === 0) return [];
-
-            // Get all data with joins
-            let result = [];
-
-            // Determine which tables are involved
-            const tableIds = [...new Set(selectedFields.map(f => f.split('.')[0]))];
-
-            // Simple approach: get data from first table and join others
-            if (tableIds.length === 1) {
-                const tableId = tableIds[0];
-                const tableData = Store.enteredData[tableId] || [];
-                const table = model.tables.find(t => t.id === tableId);
-
-                result = tableData.map(row => {
-                    const newRow = {};
-                    selectedFields.forEach(sf => {
-                        const [tId, fId] = sf.split('.');
-                        if (tId === tableId) {
-                            const field = table.fields.find(f => f.id === fId);
-                            if (field) {
-                                newRow[field.name] = row[field.name];
-                            }
-                        }
-                    });
-                    return newRow;
-                });
-            } else {
-                // Multi-table join
-                result = performJoin(tableIds, selectedFields);
-            }
-
-            // Apply filters
-            result = applyFilters(result);
-
-            // Apply aggregations if any
-            result = applyAggregations(result);
-
-            return result;
-        }
-
-        function performJoin(tableIds, selectedFields) {
-            const model = Store.currentModel;
-            const result = [];
-
-            // Simple nested loop join for demo purposes
-            const tables = tableIds.map(id => ({
-                table: model.tables.find(t => t.id === id),
-                data: Store.enteredData[id] || []
-            }));
-
-            if (tables.length === 0 || tables[0].data.length === 0) return [];
-
-            // Start with first table
-            tables[0].data.forEach(row1 => {
-                let joinedRow = { ...row1 };
-                let canJoin = true;
-
-                // Try to join with other tables
-                for (let i = 1; i < tables.length; i++) {
-                    const t = tables[i];
-                    const rel = findRelationship(tables[0].table.id, t.table.id);
-                    
-                    if (rel) {
-                        const matchingRow = t.data.find(r2 => {
-                            // Try to match on FK relationships
-                            const fromTable = model.tables.find(t => t.id === rel.fromTable);
-                            const pkField = fromTable?.fields.find(f => f.isPrimaryKey);
-                            if (pkField) {
-                                const pkValue = joinedRow[pkField.name] || joinedRow[fromTable.name + ' ID'];
-                                const fkValue = r2[fromTable.name + ' ID'] || r2[pkField.name];
-                                return pkValue === fkValue;
-                            }
-                            return false;
-                        });
-
-                        if (matchingRow) {
-                            joinedRow = { ...joinedRow, ...matchingRow };
-                        }
-                    } else {
-                        // No direct relationship, include first row
-                        if (t.data.length > 0) {
-                            joinedRow = { ...joinedRow, ...t.data[0] };
-                        }
-                    }
-                }
-
-                // Extract only selected fields
-                const finalRow = {};
-                selectedFields.forEach(sf => {
-                    const [tId, fId] = sf.split('.');
-                    const table = model.tables.find(t => t.id === tId);
-                    const field = table?.fields.find(f => f.id === fId);
-                    if (field && joinedRow[field.name] !== undefined) {
-                        finalRow[field.name] = joinedRow[field.name];
-                    }
-                });
-
-                result.push(finalRow);
-            });
-
-            return result;
-        }
-
-        function findRelationship(tableId1, tableId2) {
-            const model = Store.currentModel;
-            return model.relationships.find(r => 
-                (r.fromTable === tableId1 && r.toTable === tableId2) ||
-                (r.fromTable === tableId2 && r.toTable === tableId1)
-            );
-        }
-
-        function applyFilters(data) {
-            const filters = Store.reportConfig.filters;
-            if (filters.length === 0) return data;
-
-            return data.filter(row => {
-                return filters.every(filter => {
-                    if (!filter.field) return true;
-
-                    const [tableId, fieldId] = filter.field.split('.');
-                    const model = Store.currentModel;
-                    const table = model.tables.find(t => t.id === tableId);
-                    const field = table?.fields.find(f => f.id === fieldId);
-                    if (!field) return true;
-
-                    const value = row[field.name];
-                    const filterValue = filter.value;
-
-                    switch (filter.operator) {
-                        case 'eq': return String(value) === String(filterValue);
-                        case 'neq': return String(value) !== String(filterValue);
-                        case 'gt': return Number(value) > Number(filterValue);
-                        case 'lt': return Number(value) < Number(filterValue);
-                        case 'null': return value === null || value === undefined || value === '';
-                        case 'notnull': return value !== null && value !== undefined && value !== '';
-                        default: return true;
-                    }
-                });
-            });
-        }
-
-        function applyAggregations(data) {
-            const aggs = Store.reportConfig.aggregations;
-            const hasAggs = Object.values(aggs).some(v => v);
-            if (!hasAggs) return data;
-
-            const model = Store.currentModel;
-            const result = {};
-
-            Object.entries(aggs).forEach(([key, aggType]) => {
-                if (!aggType) return;
-
-                const [tableId, fieldId] = key.split('.');
-                const table = model.tables.find(t => t.id === tableId);
-                const field = table?.fields.find(f => f.id === fieldId);
-                if (!field) return;
-
-                const values = data.map(row => Number(row[field.name]) || 0);
-
-                switch (aggType) {
-                    case 'count':
-                        result[`${field.name} (Count)`] = values.length;
-                        break;
-                    case 'sum':
-                        result[`${field.name} (Sum)`] = values.reduce((a, b) => a + b, 0).toFixed(2);
-                        break;
-                    case 'avg':
-                        result[`${field.name} (Avg)`] = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
-                        break;
-                }
-            });
-
-            // If we have aggregations, return single row summary
-            if (Object.keys(result).length > 0) {
-                // Include non-aggregated fields from first row
-                const selectedFields = Store.reportConfig.selectedFields;
-                const firstRow = data[0] || {};
-                
-                selectedFields.forEach(sf => {
-                    const [tableId, fieldId] = sf.split('.');
-                    if (!aggs[sf]) {
-                        const table = model.tables.find(t => t.id === tableId);
-                        const field = table?.fields.find(f => f.id === fieldId);
-                        if (field && firstRow[field.name] !== undefined) {
-                            result[field.name] = firstRow[field.name];
-                        }
-                    }
-                });
-
-                return [result];
-            }
-
-            return data;
-        }
-
-        function getNumericSelectedFields() {
-            const model = Store.currentModel;
-            return Store.reportConfig.selectedFields
-                .map(sf => {
-                    const [tableId, fieldId] = sf.split('.');
-                    const table = model.tables.find(t => t.id === tableId);
-                    const field = table?.fields.find(f => f.id === fieldId);
-                    if (field && ['Number', 'Decimal'].includes(field.type)) {
-                        return { key: sf, fieldName: field.name };
-                    }
-                    return null;
-                })
-                .filter(Boolean);
-        }
-
-        function calculateStats(data) {
-            const model = Store.currentModel;
-            const stats = [];
-
-            // Calculate stats for numeric fields
-            Store.reportConfig.selectedFields.forEach(sf => {
-                const [tableId, fieldId] = sf.split('.');
-                const table = model.tables.find(t => t.id === tableId);
-                const field = table?.fields.find(f => f.id === fieldId);
-
-                if (field && ['Number', 'Decimal'].includes(field.type)) {
-                    const values = data.map(row => Number(row[field.name]) || 0).filter(v => !isNaN(v));
-                    if (values.length > 0) {
-                        const sum = values.reduce((a, b) => a + b, 0);
-                        stats.push({
-                            label: `${field.name} Total`,
-                            value: sum.toLocaleString(undefined, { maximumFractionDigits: 2 })
-                        });
-                    }
-                }
-            });
-
-            return stats;
-        }
-
-        // ============================================
-        // EVENT HANDLERS
-        // ============================================
-        function navigateTo(screen) {
-            Store.currentScreen = screen;
-            if (screen === 'data-entry') {
-                Store.entryMode = null;
-                Store.selectedTables = [];
-            }
-            render();
-        }
-
-        function createNewModel() {
-            const name = prompt('Enter data model name:');
-            if (!name) return;
-
-            const model = {
-                id: generateId(),
-                name: name,
-                description: '',
-                tables: [],
-                relationships: []
-            };
-
-            Store.dataModels.push(model);
-            openModel(model.id);
-        }
-
-        function openModel(id) {
-            Store.currentModel = Store.dataModels.find(m => m.id === id);
-            Store.selectedTable = null;
-            Store.currentScreen = 'designer';
-            render();
-        }
-
-        function selectTable(id) {
-            Store.selectedTable = Store.currentModel.tables.find(t => t.id === id);
-            render();
-        }
-
-        function switchPanelTab(tab) {
-            document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-            
-            const content = document.getElementById('panelContent');
-            if (tab === 'fields') {
-                content.innerHTML = Store.selectedTable ? renderFieldsPanel(Store.selectedTable) : '<div class="empty-state"><p>Select a table</p></div>';
-            } else {
-                content.innerHTML = renderRelationshipsPanel();
-            }
-        }
-
-        function showAddTableModal() {
-            const modal = document.getElementById('modalContainer');
-            modal.innerHTML = `
-                <div class="modal-overlay" onclick="closeModal(event)">
-                    <div class="modal" onclick="event.stopPropagation()">
-                        <div class="modal-header">
-                            <span class="modal-title">Add New Table</span>
-                            <button class="modal-close" onclick="closeModal()">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label class="form-label">Table Name</label>
-                                <input type="text" class="form-input" id="newTableName" placeholder="e.g., Customers">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-checkbox">
-                                    <input type="checkbox" id="newTableJunction">
-                                    <span>This is a junction table (connects two other tables)</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                            <button class="btn btn-primary" onclick="addTable()">Create Table</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function addTable() {
-            const name = document.getElementById('newTableName').value.trim();
-            const isJunction = document.getElementById('newTableJunction').checked;
-
-            if (!name) {
-                alert('Please enter a table name');
-                return;
-            }
-
-            const table = {
-                id: generateId(),
-                name: name,
-                isJunction: isJunction,
-                position: { x: 50 + Math.random() * 200, y: 50 + Math.random() * 200 },
-                fields: [
-                    {
-                        id: generateId(),
-                        name: name + ' ID',
-                        type: 'Number',
-                        isPrimaryKey: true,
-                        isRequired: true,
-                        isUnique: true
-                    }
-                ]
-            };
-
-            Store.currentModel.tables.push(table);
-            Store.selectedTable = table;
-            closeModal();
-            render();
-        }
-
-        function updateTableName(tableId, name) {
-            const table = Store.currentModel.tables.find(t => t.id === tableId);
-            if (table) {
-                table.name = name;
-                render();
-            }
-        }
-
-        function toggleJunction(tableId, isJunction) {
-            const table = Store.currentModel.tables.find(t => t.id === tableId);
-            if (table) {
-                table.isJunction = isJunction;
-                render();
-            }
-        }
-
-        function deleteTable(tableId) {
-            if (!confirm('Are you sure you want to delete this table?')) return;
-
-            const model = Store.currentModel;
-            model.tables = model.tables.filter(t => t.id !== tableId);
-            model.relationships = model.relationships.filter(r => r.fromTable !== tableId && r.toTable !== tableId);
-            Store.selectedTable = null;
-            render();
-        }
-
-        function showAddFieldModal(tableId) {
-            const modal = document.getElementById('modalContainer');
-            modal.innerHTML = `
-                <div class="modal-overlay" onclick="closeModal(event)">
-                    <div class="modal" onclick="event.stopPropagation()">
-                        <div class="modal-header">
-                            <span class="modal-title">Add New Field</span>
-                            <button class="modal-close" onclick="closeModal()">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label class="form-label">Field Name</label>
-                                <input type="text" class="form-input" id="newFieldName" placeholder="e.g., Full Name">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Field Type</label>
-                                <select class="form-select" id="newFieldType">
-                                    <option value="Text">Text</option>
-                                    <option value="Long Text">Long Text</option>
-                                    <option value="Number">Number</option>
-                                    <option value="Decimal">Decimal</option>
-                                    <option value="Email">Email</option>
-                                    <option value="Password">Password</option>
-                                    <option value="Date">Date</option>
-                                    <option value="Boolean">Yes / No</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-checkbox">
-                                    <input type="checkbox" id="newFieldRequired">
-                                    <span>Required field</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-checkbox">
-                                    <input type="checkbox" id="newFieldUnique">
-                                    <span>Unique ID field</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                            <button class="btn btn-primary" onclick="addField('${tableId}')">Add Field</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function addField(tableId) {
-            const name = document.getElementById('newFieldName').value.trim();
-            const type = document.getElementById('newFieldType').value;
-            const isRequired = document.getElementById('newFieldRequired').checked;
-            const isUnique = document.getElementById('newFieldUnique').checked;
-
-            if (!name) {
-                alert('Please enter a field name');
-                return;
-            }
-
-            const table = Store.currentModel.tables.find(t => t.id === tableId);
-            if (table) {
-                table.fields.push({
-                    id: generateId(),
-                    name: name,
-                    type: type,
-                    isPrimaryKey: false,
-                    isRequired: isRequired,
-                    isUnique: isUnique
-                });
-                closeModal();
-                render();
-            }
-        }
-
-        function showEditFieldModal(tableId, fieldId) {
-            const table = Store.currentModel.tables.find(t => t.id === tableId);
-            const field = table?.fields.find(f => f.id === fieldId);
-            if (!field) return;
-
-            const modal = document.getElementById('modalContainer');
-            modal.innerHTML = `
-                <div class="modal-overlay" onclick="closeModal(event)">
-                    <div class="modal" onclick="event.stopPropagation()">
-                        <div class="modal-header">
-                            <span class="modal-title">Edit Field</span>
-                            <button class="modal-close" onclick="closeModal()">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label class="form-label">Field Name</label>
-                                <input type="text" class="form-input" id="editFieldName" value="${field.name}">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Field Type</label>
-                                <select class="form-select" id="editFieldType">
-                                    <option value="Text" ${field.type === 'Text' ? 'selected' : ''}>Text</option>
-                                    <option value="Long Text" ${field.type === 'Long Text' ? 'selected' : ''}>Long Text</option>
-                                    <option value="Number" ${field.type === 'Number' ? 'selected' : ''}>Number</option>
-                                    <option value="Decimal" ${field.type === 'Decimal' ? 'selected' : ''}>Decimal</option>
-                                    <option value="Email" ${field.type === 'Email' ? 'selected' : ''}>Email</option>
-                                    <option value="Password" ${field.type === 'Password' ? 'selected' : ''}>Password</option>
-                                    <option value="Date" ${field.type === 'Date' ? 'selected' : ''}>Date</option>
-                                    <option value="Boolean" ${field.type === 'Boolean' ? 'selected' : ''}>Yes / No</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-checkbox">
-                                    <input type="checkbox" id="editFieldRequired" ${field.isRequired ? 'checked' : ''}>
-                                    <span>Required field</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-checkbox">
-                                    <input type="checkbox" id="editFieldUnique" ${field.isUnique ? 'checked' : ''}>
-                                    <span>Unique ID field</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                            <button class="btn btn-primary" onclick="updateField('${tableId}', '${fieldId}')">Save Changes</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function updateField(tableId, fieldId) {
-            const table = Store.currentModel.tables.find(t => t.id === tableId);
-            const field = table?.fields.find(f => f.id === fieldId);
-            if (!field) return;
-
-            field.name = document.getElementById('editFieldName').value.trim();
-            field.type = document.getElementById('editFieldType').value;
-            field.isRequired = document.getElementById('editFieldRequired').checked;
-            field.isUnique = document.getElementById('editFieldUnique').checked;
-
-            closeModal();
-            render();
-        }
-
-        function deleteField(tableId, fieldId) {
-            if (!confirm('Are you sure you want to delete this field?')) return;
-
-            const table = Store.currentModel.tables.find(t => t.id === tableId);
-            if (table) {
-                table.fields = table.fields.filter(f => f.id !== fieldId);
-                render();
-            }
-        }
-
-        function showAddRelationshipModal() {
-            const model = Store.currentModel;
-            const modal = document.getElementById('modalContainer');
-            modal.innerHTML = `
-                <div class="modal-overlay" onclick="closeModal(event)">
-                    <div class="modal" onclick="event.stopPropagation()">
-                        <div class="modal-header">
-                            <span class="modal-title">Add Relationship</span>
-                            <button class="modal-close" onclick="closeModal()">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label class="form-label">From Table</label>
-                                <select class="form-select" id="relFromTable">
-                                    <option value="">Select table...</option>
-                                    ${model.tables.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Relationship Type</label>
-                                <select class="form-select" id="relType">
-                                    <option value="one-to-one">One record matches one record</option>
-                                    <option value="one-to-many">One record matches many records</option>
-                                    <option value="many-to-many">Many records match many records</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">To Table</label>
-                                <select class="form-select" id="relToTable">
-                                    <option value="">Select table...</option>
-                                    ${model.tables.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
-                                </select>
-                            </div>
-                            <div class="alert alert-info" id="manyToManyNote" style="display: none;">
-                                A junction table will be created automatically to connect these tables.
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                            <button class="btn btn-primary" onclick="addRelationship()">Create Relationship</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('relType').addEventListener('change', function() {
-                document.getElementById('manyToManyNote').style.display = 
-                    this.value === 'many-to-many' ? 'block' : 'none';
-            });
-        }
-
-        function addRelationship() {
-            const fromTable = document.getElementById('relFromTable').value;
-            const toTable = document.getElementById('relToTable').value;
-            const type = document.getElementById('relType').value;
-
-            if (!fromTable || !toTable) {
-                alert('Please select both tables');
-                return;
-            }
-
-            if (fromTable === toTable) {
-                alert('Cannot create relationship to same table');
-                return;
-            }
-
-            const model = Store.currentModel;
-
-            // Check for duplicate
-            const exists = model.relationships.some(r => 
-                (r.fromTable === fromTable && r.toTable === toTable) ||
-                (r.fromTable === toTable && r.toTable === fromTable)
-            );
-
-            if (exists) {
-                alert('A relationship already exists between these tables');
-                return;
-            }
-
-            if (type === 'many-to-many') {
-                // Create junction table
-                const fromT = model.tables.find(t => t.id === fromTable);
-                const toT = model.tables.find(t => t.id === toTable);
-                const junctionName = `${fromT.name}_${toT.name}`;
-
-                const junctionTable = {
-                    id: generateId(),
-                    name: junctionName,
-                    isJunction: true,
-                    position: {
-                        x: (fromT.position.x + toT.position.x) / 2,
-                        y: (fromT.position.y + toT.position.y) / 2 + 100
-                    },
-                    fields: [
-                        { id: generateId(), name: junctionName + ' ID', type: 'Number', isPrimaryKey: true, isRequired: true, isUnique: true }
-                    ]
-                };
-
-                model.tables.push(junctionTable);
-
-                // Create two 1:N relationships
-                model.relationships.push({
-                    id: generateId(),
-                    fromTable: fromTable,
-                    toTable: junctionTable.id,
-                    type: 'one-to-many'
-                });
-
-                model.relationships.push({
-                    id: generateId(),
-                    fromTable: toTable,
-                    toTable: junctionTable.id,
-                    type: 'one-to-many'
-                });
-            } else {
-                model.relationships.push({
-                    id: generateId(),
-                    fromTable: fromTable,
-                    toTable: toTable,
-                    type: type
-                });
-            }
-
-            closeModal();
-            render();
-        }
-
-        function deleteRelationship(id) {
-            if (!confirm('Are you sure you want to delete this relationship?')) return;
-
-            Store.currentModel.relationships = Store.currentModel.relationships.filter(r => r.id !== id);
-            render();
-        }
-
-        function showSQLPreviewModal() {
-            const sql = generateSQL(Store.currentModel);
-            const modal = document.getElementById('modalContainer');
-            modal.innerHTML = `
-                <div class="modal-overlay" onclick="closeModal(event)">
-                    <div class="modal" style="max-width: 800px;" onclick="event.stopPropagation()">
-                        <div class="modal-header">
-                            <span class="modal-title">SQL Schema</span>
-                            <button class="modal-close" onclick="closeModal()">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <pre class="sql-preview">${highlightSQL(sql)}</pre>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary" onclick="copySQL()">Copy SQL</button>
-                            <button class="btn btn-primary" onclick="downloadSQL()">Download .sql</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function highlightSQL(sql) {
-            return sql
-                .replace(/\b(CREATE TABLE|PRIMARY KEY|FOREIGN KEY|REFERENCES|NOT NULL|UNIQUE|INT|VARCHAR|TEXT|FLOAT|DATE|BOOLEAN)\b/g, '<span class="sql-keyword">$1</span>');
-        }
-
-        function copySQL() {
-            const sql = generateSQL(Store.currentModel);
-            navigator.clipboard.writeText(sql).then(() => {
-                alert('SQL copied to clipboard');
-            });
-        }
-
-        function downloadSQL() {
-            const sql = generateSQL(Store.currentModel);
-            const blob = new Blob([sql], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${Store.currentModel.name.replace(/\s+/g, '_').toLowerCase()}_schema.sql`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function closeModal(event) {
-            if (event && event.target !== event.currentTarget) return;
-            document.getElementById('modalContainer').innerHTML = '';
-        }
-
-        // Data Entry Handlers
-        function selectEntryMode(mode) {
-            Store.entryMode = mode;
-            Store.selectedTables = [];
-            render();
-        }
-
-        function toggleTableSelection(tableId) {
-            const idx = Store.selectedTables.indexOf(tableId);
-            if (idx >= 0) {
-                Store.selectedTables.splice(idx, 1);
-            } else {
-                Store.selectedTables.push(tableId);
-            }
-            render();
-        }
-
-        function startDataEntry() {
-            if (Store.entryMode === 'flow') {
-                Store.selectedTables = Store.currentModel.tables.map(t => t.id);
-            }
-
-            if (Store.selectedTables.length === 0) {
-                alert('Please select at least one table');
-                return;
-            }
-
-            Store.currentScreen = 'data-entry-form';
-            render();
-        }
-
-        function addRepeatableRow(tableId) {
-            const container = document.getElementById(`repeatable-${tableId}`);
-            const table = Store.currentModel.tables.find(t => t.id === tableId);
-            const currentRows = container.querySelectorAll('.repeatable-section').length;
-            
-            const newRow = document.createElement('div');
-            newRow.innerHTML = renderRepeatableRow(table, currentRows);
-            container.appendChild(newRow.firstElementChild);
-        }
-
-        function removeRepeatableRow(tableId, index) {
-            const container = document.getElementById(`repeatable-${tableId}`);
-            const row = container.querySelector(`[data-row-index="${index}"]`);
-            if (row) {
-                row.remove();
-                // Re-index remaining rows
-                container.querySelectorAll('.repeatable-section').forEach((r, i) => {
-                    r.dataset.rowIndex = i;
-                    r.querySelector('.repeatable-title').textContent = `Entry ${i + 1}`;
-                });
-            }
-        }
-
-        function submitDataEntry(event) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
-            const model = Store.currentModel;
-            const tablesToProcess = getEntryTables();
-
-            const flowSteps = [];
-
-            tablesToProcess.forEach(table => {
-                const isRepeatable = isTableRepeatable(table.id);
-                
-                if (!Store.enteredData[table.id]) {
-                    Store.enteredData[table.id] = [];
-                }
-
-                if (isRepeatable) {
-                    // Handle repeatable rows
-                    const container = document.getElementById(`repeatable-${table.id}`);
-                    const rows = container?.querySelectorAll('.repeatable-section') || [];
-                    
-                    rows.forEach((row, rowIndex) => {
-                        const record = {};
-                        const pkField = table.fields.find(f => f.isPrimaryKey);
-                        if (pkField) {
-                            record[pkField.name] = generateNumericId();
-                        }
-
-                        table.fields.filter(f => !f.isPrimaryKey).forEach(field => {
-                            const key = `${table.id}_${rowIndex}_${field.id}`;
-                            let value = formData.get(key);
-                            
-                            if (field.type === 'Number') value = parseInt(value) || 0;
-                            else if (field.type === 'Decimal') value = parseFloat(value) || 0;
-                            else if (field.type === 'Boolean') value = value === 'true';
-                            
-                            record[field.name] = value;
-                        });
-
-                        // Add FK references
-                        const parentTable = getParentTable(table.id);
-                        if (parentTable) {
-                            const parentData = Store.enteredData[parentTable.id];
-                            if (parentData && parentData.length > 0) {
-                                const pkField = parentTable.fields.find(f => f.isPrimaryKey);
-                                if (pkField) {
-                                    record[parentTable.name + ' ID'] = parentData[parentData.length - 1][pkField.name];
-                                }
-                            }
-                        }
-
-                        Store.enteredData[table.id].push(record);
-
-                        flowSteps.push({
-                            table: table.name,
-                            action: 'Created',
-                            data: record
-                        });
-                    });
-                } else {
-                    // Handle single entry
-                    const record = {};
-                    const pkField = table.fields.find(f => f.isPrimaryKey);
-                    if (pkField) {
-                        record[pkField.name] = generateNumericId();
-                    }
-
-                    table.fields.filter(f => !f.isPrimaryKey).forEach(field => {
-                        const key = `${table.id}_${field.id}`;
-                        let value = formData.get(key);
-                        
-                        if (field.type === 'Number') value = parseInt(value) || 0;
-                        else if (field.type === 'Decimal') value = parseFloat(value) || 0;
-                        else if (field.type === 'Boolean') value = value === 'true';
-                        
-                        record[field.name] = value;
-                    });
-
-                    // Add FK references
-                    const parentTable = getParentTable(table.id);
-                    if (parentTable) {
-                        const parentData = Store.enteredData[parentTable.id];
-                        if (parentData && parentData.length > 0) {
-                            const pkField = parentTable.fields.find(f => f.isPrimaryKey);
-                            if (pkField) {
-                                record[parentTable.name + ' ID'] = parentData[parentData.length - 1][pkField.name];
-                            }
-                        }
-                    }
-
-                    Store.enteredData[table.id].push(record);
-
-                    flowSteps.push({
-                        table: table.name,
-                        action: 'Created',
-                        data: record
-                    });
-                }
-            });
-
-            // Show data flow visualization
-            showDataFlowViz(flowSteps);
-        }
-
-        function showDataFlowViz(steps) {
-            const viz = document.getElementById('dataFlowViz');
-            viz.innerHTML = `
-                <div class="data-flow-viz">
-                    <h3 style="margin-bottom: 20px;">Data Flow Visualization</h3>
-                    <div class="alert alert-success" style="margin-bottom: 20px;">
-                        Data submitted successfully! ${steps.length} record(s) created.
-                    </div>
-                    ${steps.map((step, i) => `
-                        <div class="flow-step">
-                            <div class="flow-step-number">${i + 1}</div>
-                            <div class="flow-step-content">
-                                <div class="flow-step-title">${step.action} record in ${step.table}</div>
-                                <div class="flow-step-data">${JSON.stringify(step.data, null, 2)}</div>
-                            </div>
-                        </div>
-                        ${i < steps.length - 1 ? '<div class="flow-arrow">↓</div>' : ''}
-                    `).join('')}
-                    <div style="margin-top: 24px; display: flex; gap: 12px;">
-                        <button class="btn btn-primary" onclick="resetForm()">Enter More Data</button>
-                        <button class="btn btn-secondary" onclick="navigateTo('reports')">View Reports</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function resetForm() {
-            Store.currentScreen = 'data-entry';
-            Store.entryMode = null;
-            Store.selectedTables = [];
-            render();
-        }
-
-        // Report Handlers
-        function toggleReportField(tableId, fieldId) {
-            const key = `${tableId}.${fieldId}`;
-            const idx = Store.reportConfig.selectedFields.indexOf(key);
-            if (idx >= 0) {
-                Store.reportConfig.selectedFields.splice(idx, 1);
-                delete Store.reportConfig.aggregations[key];
-            } else {
-                Store.reportConfig.selectedFields.push(key);
-            }
-            render();
-        }
-
-        function setAggregation(key, value) {
-            Store.reportConfig.aggregations[key] = value || null;
-            render();
-        }
-
-        function addFilter() {
-            Store.reportConfig.filters.push({
-                field: '',
-                operator: 'eq',
-                value: ''
-            });
-            render();
-        }
-
-        function updateFilter(index, prop, value) {
-            Store.reportConfig.filters[index][prop] = value;
-            render();
-        }
-
-        function removeFilter(index) {
-            Store.reportConfig.filters.splice(index, 1);
-            render();
-        }
-
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        function init() {
-            // Create demo model
-            const demoModel = createDemoModel();
-            Store.dataModels.push(demoModel);
-            Store.currentModel = demoModel;
-
-            // Create demo data
-            createDemoData();
-
-            // Render initial screen
-            render();
-        }
-
-        // Start the application
-        init();
-    </script>
+        order.push(t);
+    }
+    for(var i=0;i<m.tables.length;i++)visit(m.tables[i]);
+    return order;
+}
+
+function render(){
+    var app=document.getElementById('app');
+    switch(Store.currentScreen){
+        case'home':app.innerHTML=renderHome();break;
+        case'pages':app.innerHTML=renderPages();break;
+        case'models':app.innerHTML=renderModels();break;
+        case'designer':app.innerHTML=renderDesigner();initER();initChat();break;
+        case'entry':app.innerHTML=renderEntry();break;
+        case'entry-form':app.innerHTML=renderEntryForm();break;
+        case'reports':app.innerHTML=renderReports();initCharts();break;
+    }
+}
+
+function renderHeader(crumbs){
+    crumbs=crumbs||[];
+    var ch='';for(var i=0;i<crumbs.length;i++)ch+='<span class="sep">/</span><span onclick="'+crumbs[i].action+'">'+crumbs[i].label+'</span>';
+    var nav='';if(Store.currentModel)nav='<button class="btn btn-s btn-sm" onclick="nav(\'entry\')">Data Entry</button><button class="btn btn-s btn-sm" onclick="nav(\'reports\')">Reports</button>';
+    return '<header class="header"><div class="breadcrumb"><span onclick="nav(\'home\')">Form Builder v5</span>'+ch+'</div><div class="nav-btns">'+nav+'</div></header>';
+}
+
+function renderHome(){
+    return renderHeader()+'<main class="main"><div class="home-screen"><h1 class="home-title">Form Builder v5</h1><p class="home-sub">A no-code database designer with AI-powered schema generation.</p><div class="home-actions"><div class="home-card" onclick="nav(\'pages\')"><h3>Pages</h3><p>View application pages</p></div><div class="home-card" onclick="nav(\'models\')"><h3>Data Models</h3><p>Design databases</p></div></div></div></main>';
+}
+
+function renderPages(){
+    var pages=[{n:'Home',t:'Public'},{n:'Login',t:'Auth'},{n:'Register',t:'Auth'},{n:'Profile',t:'Protected'},{n:'Dashboard',t:'Protected'}];
+    var h='';for(var i=0;i<pages.length;i++)h+='<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:8px;display:flex;justify-content:space-between"><span>'+pages[i].n+'</span><span class="tag">'+pages[i].t+'</span></div>';
+    return renderHeader([{label:'Pages',action:"nav('pages')"}])+'<main class="main"><h2 style="margin-bottom:24px">Application Pages</h2><div style="max-width:500px">'+h+'</div></main>';
+}
+
+function renderModels(){
+    var h='';for(var i=0;i<Store.dataModels.length;i++){var m=Store.dataModels[i];h+='<div class="model-card" onclick="openModel(\''+m.id+'\')"><h3>'+m.name+'</h3><p>'+(m.description||'No description')+'</p><div class="model-meta"><span>'+m.tables.length+' tables</span><span>'+m.relationships.length+' relationships</span></div></div>';}
+    return renderHeader([{label:'Data Models',action:"nav('models')"}])+'<main class="main"><div style="display:flex;justify-content:space-between;margin-bottom:24px"><h2>Data Models</h2><button class="btn btn-p" onclick="createModel()">Create Model</button></div><div class="models-grid">'+h+'</div></main>';
+}
+
+function renderDesigner(){
+    var m=Store.currentModel;if(!m)return'';
+    return renderHeader([{label:'Data Models',action:"nav('models')"},{label:m.name,action:''}])+'<main class="main"><div class="designer">'+renderSidebar()+renderCanvas()+renderPanel()+'</div></main><div id="modal"></div>';
+}
+
+function renderSidebar(){
+    var m=Store.currentModel,h='';
+    if(m.tables.length===0)h='<div class="empty" style="padding:20px"><p>No tables yet</p></div>';
+    else for(var i=0;i<m.tables.length;i++){var t=m.tables[i];var ac=Store.selectedTable&&Store.selectedTable.id===t.id?' active':'';var jc=t.isJunction?' junction':'';var jt=t.isJunction?' <span class="tag tag-purple">Junction</span>':'';h+='<div class="table-item'+jc+ac+'" onclick="selectTable(\''+t.id+'\')"><h4>'+t.name+jt+'</h4><p>'+t.fields.length+' fields</p></div>';}
+    return '<div class="sidebar"><div class="sidebar-header"><span class="sidebar-title">Tables</span><button class="btn btn-p btn-sm" onclick="showAddTable()">Add</button></div><div class="sidebar-content">'+h+'</div>'+renderChat()+'</div>';
+}
+
+function renderChat(){
+    return '<div class="chat-container"><div class="chat-header"><span class="chat-title">SQL Agent</span><button class="btn btn-s btn-sm btn-icon" onclick="clearChat()">C</button></div><div class="chat-messages" id="chatMsgs"></div><div class="chat-input-box"><textarea class="chat-input" id="chatIn" placeholder="Describe your data model..." rows="2" onkeydown="chatKey(event)"></textarea><button class="btn btn-p btn-sm" onclick="sendChat()">Send</button></div><div class="chat-actions" id="chatActs" style="display:none"><button class="btn btn-g btn-sm" onclick="applySQL()">Apply to Model</button><button class="btn btn-s btn-sm" onclick="copySQL()">Copy</button></div></div>';
+}
+
+function renderCanvas(){
+    return '<div class="canvas"><div class="canvas-toolbar"><button class="btn btn-s btn-sm" onclick="showAddRel()">Add Relationship</button><button class="btn btn-s btn-sm" onclick="showSQL()">View SQL</button></div><div class="er-canvas" id="erCanvas"></div></div>';
+}
+
+function renderPanel(){
+    var t=Store.selectedTable;
+    var c=t?renderFields(t):'<div class="empty"><p>Select a table</p></div>';
+    return '<div class="panel"><div class="panel-tabs"><button class="panel-tab active" data-tab="fields" onclick="switchTab(\'fields\')">Fields</button><button class="panel-tab" data-tab="rels" onclick="switchTab(\'rels\')">Relationships</button></div><div class="panel-content" id="panelContent">'+c+'</div></div>';
+}
+
+function renderFields(t){
+    var h='';for(var i=0;i<t.fields.length;i++){var f=t.fields[i];var pk=f.isPrimaryKey?'<span style="color:var(--warning)">PK</span>':'';var rq=f.isRequired?'<span style="color:var(--danger)">Required</span>':'';h+='<div class="field-item"><div class="field-header"><span class="field-name">'+f.name+'</span><div class="field-actions"><button class="btn btn-s btn-sm btn-icon" onclick="showEditField(\''+t.id+'\',\''+f.id+'\')">E</button><button class="btn btn-d btn-sm btn-icon" onclick="delField(\''+t.id+'\',\''+f.id+'\')">X</button></div></div><div class="field-meta"><span>'+f.type+'</span>'+pk+rq+'</div></div>';}
+    var jc=t.isJunction?' checked':'';
+    return '<div class="inline-form" style="margin-bottom:16px"><input class="form-input" value="'+t.name+'" onchange="updTableName(\''+t.id+'\',this.value)"><button class="btn btn-d btn-sm" onclick="delTable(\''+t.id+'\')">Delete</button></div><label class="form-check" style="margin-bottom:16px"><input type="checkbox"'+jc+' onchange="toggleJunc(\''+t.id+'\',this.checked)"><span>Junction Table</span></label><div class="divider"></div><div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:14px;font-weight:600;color:var(--text-sec)">Fields</span><button class="btn btn-s btn-sm" onclick="showAddField(\''+t.id+'\')">Add</button></div><div>'+h+'</div>';
+}
+
+function renderRels(){
+    var m=Store.currentModel,h='';
+    if(m.relationships.length===0)h='<div class="empty"><p>No relationships</p></div>';
+    else for(var i=0;i<m.relationships.length;i++){var r=m.relationships[i];var ft=m.tables.find(function(x){return x.id===r.fromTable});var tt=m.tables.find(function(x){return x.id===r.toTable});var lbl=r.type==='one-to-one'?'1:1':r.type==='one-to-many'?'1:N':'N:M';h+='<div class="rel-item"><div class="rel-visual"><span class="rel-table">'+(ft?ft.name:'?')+'</span><span class="rel-arrow">→</span><span class="rel-table">'+(tt?tt.name:'?')+'</span></div><div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--text-sec)">'+lbl+'</span><button class="btn btn-d btn-sm btn-icon" onclick="delRel(\''+r.id+'\')">X</button></div></div>';}
+    return '<div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:14px;font-weight:600;color:var(--text-sec)">Relationships</span><button class="btn btn-s btn-sm" onclick="showAddRel()">Add</button></div>'+h;
+}
+
+function renderEntry(){
+    var m=Store.currentModel;if(!m)return'';
+    var sc=Store.entryMode==='single'?' selected':'',mc=Store.entryMode==='multi'?' selected':'',fc=Store.entryMode==='flow'?' selected':'';
+    var sel='';if(Store.entryMode)sel=renderTableSel();
+    return renderHeader([{label:'Data Models',action:"nav('models')"},{label:m.name,action:"nav('designer')"},{label:'Data Entry',action:''}])+'<main class="main"><h2 style="text-align:center;margin-bottom:16px">Select Entry Mode</h2><p style="text-align:center;color:var(--text-sec);margin-bottom:32px">Choose how to enter data</p><div class="entry-modes"><div class="mode-card'+sc+'" onclick="selMode(\'single\')"><h3>Single Table</h3><p>Enter into one table</p></div><div class="mode-card'+mc+'" onclick="selMode(\'multi\')"><h3>Multi-Table</h3><p>Enter into multiple tables</p></div><div class="mode-card'+fc+'" onclick="selMode(\'flow\')"><h3>Full Flow</h3><p>Complete relationship chain</p></div></div>'+sel+'</main>';
+}
+
+function renderTableSel(){
+    var m=Store.currentModel;
+    if(Store.entryMode==='flow')return '<div style="max-width:600px;margin:32px auto;text-align:center"><h3 style="margin-bottom:16px">Full Flow</h3><p style="color:var(--text-sec);margin-bottom:24px">All tables included automatically.</p><button class="btn btn-p" onclick="startEntry()">Start</button></div>';
+    var h='';for(var i=0;i<m.tables.length;i++){var t=m.tables[i];var sel='';for(var j=0;j<Store.selectedTables.length;j++)if(Store.selectedTables[j]===t.id)sel=' selected';h+='<span class="table-chip'+sel+'" onclick="toggleTblSel(\''+t.id+'\')">'+t.name+(t.isJunction?' (J)':'')+'</span>';}
+    var btn=Store.selectedTables.length>0?'<div style="text-align:center;margin-top:24px"><button class="btn btn-p" onclick="startEntry()">Continue</button></div>':'';
+    return '<div style="max-width:600px;margin:32px auto"><h3 style="text-align:center;margin-bottom:16px">Select Tables</h3><div class="table-chips">'+h+'</div>'+btn+'</div>';
+}
+
+function renderEntryForm(){
+    var m=Store.currentModel;if(!m)return'';
+    var tables=getEntryTables(),h='';
+    for(var i=0;i<tables.length;i++){var t=tables[i];var rep=isRepeat(t.id);var jt=t.isJunction?'<span class="tag tag-purple">Junction</span>':'';var body=rep?'<div id="rep-'+t.id+'">'+renderRepRow(t,0)+'</div><button type="button" class="btn btn-s btn-sm" onclick="addRepRow(\''+t.id+'\')">Add '+t.name+'</button>':renderFormFields(t,null);h+='<div class="form-section"><div class="form-section-header"><span class="form-section-title">'+t.name+'</span>'+jt+'</div><div class="form-section-body">'+body+'</div></div>';}
+    return renderHeader([{label:'Data Models',action:"nav('models')"},{label:m.name,action:"nav('designer')"},{label:'Data Entry',action:"nav('entry')"},{label:'Form',action:''}])+'<main class="main"><form class="data-form" id="entryForm" onsubmit="submitEntry(event)">'+h+'<div style="display:flex;gap:12px;justify-content:center;margin-top:24px"><button type="button" class="btn btn-s" onclick="nav(\'entry\')">Cancel</button><button type="submit" class="btn btn-g">Submit</button></div></form><div id="flowViz"></div></main>';
+}
+
+function getEntryTables(){
+    var m=Store.currentModel;
+    if(Store.entryMode==='flow')return getTableOrder(m);
+    var r=[];for(var i=0;i<Store.selectedTables.length;i++){var t=m.tables.find(function(x){return x.id===Store.selectedTables[i]});if(t)r.push(t);}return r;
+}
+
+function renderFormFields(t,ri){
+    var m=Store.currentModel,pre=ri!==null?t.id+'_'+ri+'_':t.id+'_',h='';
+    for(var i=0;i<t.fields.length;i++){var f=t.fields[i];if(f.isPrimaryKey)continue;var rq=f.isRequired?' *':'';h+='<div class="form-group"><label class="form-label">'+f.name+rq+'</label>'+renderInput(f,pre)+'</div>';}
+    for(var j=0;j<m.relationships.length;j++){var rel=m.relationships[j];if(rel.toTable===t.id){var ft=m.tables.find(function(x){return x.id===rel.fromTable});if(ft){var opts=getLookup(ft.id),oh='<option value="">Select '+ft.name+'...</option>';for(var k=0;k<opts.length;k++)oh+='<option value="'+opts[k].v+'">'+opts[k].l+'</option>';h+='<div class="form-group"><label class="form-label">'+ft.name+' *</label><select class="form-select" name="'+pre+'fk_'+ft.id+'" required>'+oh+'</select></div>';}}}
+    return '<div class="form-row">'+h+'</div>';
+}
+
+function renderRepRow(t,i){
+    var rm=i>0?'<button type="button" class="btn btn-d btn-sm" onclick="remRepRow(\''+t.id+'\','+i+')">Remove</button>':'';
+    return '<div class="repeat-section" data-ri="'+i+'"><div class="repeat-header"><span class="repeat-title">Entry '+(i+1)+'</span>'+rm+'</div>'+renderFormFields(t,i)+'</div>';
+}
+
+function renderInput(f,pre){
+    var n=pre+f.id,rq=f.isRequired?' required':'';
+    switch(f.type){
+        case'Long Text':return '<textarea class="form-textarea" name="'+n+'"'+rq+'></textarea>';
+        case'Number':return '<input type="number" class="form-input" name="'+n+'"'+rq+'>';
+        case'Decimal':return '<input type="number" step="0.01" class="form-input" name="'+n+'"'+rq+'>';
+        case'Email':return '<input type="email" class="form-input" name="'+n+'"'+rq+'>';
+        case'Password':return '<input type="password" class="form-input" name="'+n+'"'+rq+'>';
+        case'Date':return '<input type="date" class="form-input" name="'+n+'"'+rq+'>';
+        case'Boolean':return '<select class="form-select" name="'+n+'"'+rq+'><option value="">Select...</option><option value="true">Yes</option><option value="false">No</option></select>';
+        default:return '<input type="text" class="form-input" name="'+n+'"'+rq+'>';
+    }
+}
+
+function getLookup(tid){
+    var data=Store.enteredData[tid]||[],m=Store.currentModel,t=m.tables.find(function(x){return x.id===tid});if(!t)return[];
+    var pk=t.fields.find(function(x){return x.isPrimaryKey}),df=t.fields.find(function(x){return !x.isPrimaryKey&&x.type==='Text'})||t.fields.find(function(x){return !x.isPrimaryKey});
+    var r=[];for(var i=0;i<data.length;i++){var row=data[i];r.push({v:pk?row[pk.name]:JSON.stringify(row),l:df?row[df.name]:(pk?row[pk.name]:'Record')});}return r;
+}
+
+function isRepeat(tid){var m=Store.currentModel;for(var i=0;i<m.relationships.length;i++)if(m.relationships[i].toTable===tid&&m.relationships[i].type==='one-to-many')return true;return false;}
+
+function renderReports(){
+    var m=Store.currentModel;if(!m)return'';
+    return renderHeader([{label:'Data Models',action:"nav('models')"},{label:m.name,action:"nav('designer')"},{label:'Reports',action:''}])+'<main class="main"><div class="report-builder">'+renderReportConfig()+renderReportPreview()+'</div></main>';
+}
+
+function renderReportConfig(){
+    var m=Store.currentModel,fh='';
+    for(var i=0;i<m.tables.length;i++){var t=m.tables[i];for(var j=0;j<t.fields.length;j++){var f=t.fields[j],k=t.id+'.'+f.id,ch='';for(var s=0;s<Store.reportConfig.selectedFields.length;s++)if(Store.reportConfig.selectedFields[s]===k)ch=' checked';fh+='<label class="field-opt"><input type="checkbox"'+ch+' onchange="toggleRptField(\''+t.id+'\',\''+f.id+'\')"><span>'+f.name+'</span><span class="tname">'+t.name+'</span></label>';}}
+    var chC=Store.reportConfig.showChart?' checked':'',stC=Store.reportConfig.showStats?' checked':'',tbC=Store.reportConfig.showTable?' checked':'';
+    return '<div class="report-config"><div class="sidebar-header"><span class="sidebar-title">Configuration</span></div><div class="sidebar-content" style="max-height:none;flex:1;overflow-y:auto;padding:16px"><div class="form-group"><label class="form-label">Select Fields</label><div class="field-selector">'+fh+'</div></div><div class="divider"></div><div class="form-group"><label class="form-label">Presentation</label><label class="form-check" style="margin-bottom:8px"><input type="checkbox"'+chC+' onchange="Store.reportConfig.showChart=this.checked;render()"><span>Show Chart</span></label><label class="form-check" style="margin-bottom:8px"><input type="checkbox"'+stC+' onchange="Store.reportConfig.showStats=this.checked;render()"><span>Show Statistics</span></label><label class="form-check"><input type="checkbox"'+tbC+' onchange="Store.reportConfig.showTable=this.checked;render()"><span>Show Table</span></label></div></div></div>';
+}
+
+function renderReportPreview(){
+    if(Store.reportConfig.selectedFields.length===0)return '<div class="report-preview"><div class="empty"><h3>Select Fields</h3><p>Choose fields from configuration</p></div></div>';
+    var data=getReportData(),c='<h3 style="margin-bottom:24px">Report</h3>';
+    if(Store.reportConfig.showStats)c+='<div class="stats-grid"><div class="stat-card"><div class="stat-value">'+data.length+'</div><div class="stat-label">Records</div></div></div>';
+    if(Store.reportConfig.showChart)c+='<div class="chart-box"><canvas id="rptChart"></canvas></div>';
+    if(Store.reportConfig.showTable&&data.length>0){var ks=Object.keys(data[0]),th='',tb='';for(var h=0;h<ks.length;h++)th+='<th>'+ks[h]+'</th>';var lim=Math.min(data.length,50);for(var r=0;r<lim;r++){tb+='<tr>';for(var c2=0;c2<ks.length;c2++){var v=data[r][ks[c2]];tb+='<td>'+(v!==undefined&&v!==null?v:'-')+'</td>';}tb+='</tr>';}c+='<table class="data-table"><thead><tr>'+th+'</tr></thead><tbody>'+tb+'</tbody></table>';}
+    return '<div class="report-preview">'+c+'</div>';
+}
+
+function getReportData(){
+    var m=Store.currentModel;if(!m||Store.reportConfig.selectedFields.length===0)return[];
+    var tids=[];for(var i=0;i<Store.reportConfig.selectedFields.length;i++){var p=Store.reportConfig.selectedFields[i].split('.')[0];if(tids.indexOf(p)===-1)tids.push(p);}
+    if(tids.length===1){var tid=tids[0],data=Store.enteredData[tid]||[],t=m.tables.find(function(x){return x.id===tid});if(!t)return[];var r=[];for(var d=0;d<data.length;d++){var row=data[d],nr={};for(var s=0;s<Store.reportConfig.selectedFields.length;s++){var sp=Store.reportConfig.selectedFields[s].split('.');if(sp[0]===tid){var f=t.fields.find(function(x){return x.id===sp[1]});if(f)nr[f.name]=row[f.name];}}r.push(nr);}return r;}
+    return[];
+}
+
+function initER(){
+    var canvas=document.getElementById('erCanvas');if(!canvas)return;var m=Store.currentModel;if(!m)return;
+    var h='';for(var i=0;i<m.tables.length;i++)h+=renderERTable(m.tables[i]);
+    h+=renderLines();canvas.innerHTML=h;
+    for(var j=0;j<m.tables.length;j++){var el=document.getElementById('ert-'+m.tables[j].id);if(el)makeDrag(el,m.tables[j]);}
+}
+
+function renderERTable(t){
+    var m=Store.currentModel,sel=Store.selectedTable&&Store.selectedTable.id===t.id?' selected':'',jc=t.isJunction?' junction':'';
+    var fh='';for(var i=0;i<t.fields.length;i++){var f=t.fields[i];var pk=f.isPrimaryKey?'<span class="er-field-pk">PK</span>':'';var rq=f.isRequired&&!f.isPrimaryKey?'<span style="color:var(--danger);font-size:9px">*</span>':'';fh+='<div class="er-field"><span class="er-field-name">'+f.name+'</span><span class="er-field-type">'+f.type+'</span>'+pk+rq+'</div>';}
+    for(var r=0;r<m.relationships.length;r++){var rel=m.relationships[r];if(rel.toTable===t.id){var ft=m.tables.find(function(x){return x.id===rel.fromTable});if(ft)fh+='<div class="er-field"><span class="er-field-name">'+ft.name+' ID</span><span class="er-field-fk">FK</span></div>';}}
+    return '<div class="er-table'+jc+sel+'" id="ert-'+t.id+'" style="left:'+t.position.x+'px;top:'+t.position.y+'px" onclick="selectTable(\''+t.id+'\')"><div class="er-table-header">'+t.name+(t.isJunction?' <span style="font-size:9px;background:var(--purple);color:#fff;padding:1px 4px;border-radius:3px">J</span>':'')+'</div><div style="padding:4px 0">'+fh+'</div></div>';
+}
+
+function renderLines(){
+    var m=Store.currentModel,svg='<svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible">';
+    for(var i=0;i<m.relationships.length;i++){var r=m.relationships[i],ft=m.tables.find(function(x){return x.id===r.fromTable}),tt=m.tables.find(function(x){return x.id===r.toTable});
+    if(ft&&tt){var fx=ft.position.x+90,fy=ft.position.y+30,tx=tt.position.x+90,ty=tt.position.y+30,mx=(fx+tx)/2,my=(fy+ty)/2,lbl=r.type==='one-to-one'?'1:1':r.type==='one-to-many'?'1:N':'N:M';svg+='<path d="M'+fx+' '+fy+' Q'+mx+' '+fy+' '+mx+' '+my+' Q'+mx+' '+ty+' '+tx+' '+ty+'" fill="none" stroke="var(--accent)" stroke-width="2"/><circle cx="'+tx+'" cy="'+ty+'" r="4" fill="var(--accent)"/><text x="'+(mx+8)+'" y="'+my+'" fill="var(--text-sec)" font-size="10">'+lbl+'</text>';}}
+    return svg+'</svg>';
+}
+
+var dragState={active:false,el:null,table:null,sx:0,sy:0,ix:0,iy:0};
+
+document.addEventListener('mousemove',function(e){
+    if(!dragState.active||!dragState.table)return;
+    dragState.table.position.x=Math.max(0,dragState.ix+e.clientX-dragState.sx);
+    dragState.table.position.y=Math.max(0,dragState.iy+e.clientY-dragState.sy);
+    dragState.el.style.left=dragState.table.position.x+'px';
+    dragState.el.style.top=dragState.table.position.y+'px';
+    var c=document.getElementById('erCanvas'),s=c?c.querySelector('svg'):null;
+    if(s)s.outerHTML=renderLines();
+});
+
+document.addEventListener('mouseup',function(){
+    if(dragState.el)dragState.el.style.cursor='move';
+    dragState.active=false;dragState.el=null;dragState.table=null;
+});
+
+function makeDrag(el,t){
+    el.onmousedown=function(e){
+        if(e.target.tagName==='BUTTON')return;
+        e.preventDefault();
+        dragState.active=true;
+        dragState.el=el;
+        dragState.table=t;
+        dragState.sx=e.clientX;
+        dragState.sy=e.clientY;
+        dragState.ix=t.position.x;
+        dragState.iy=t.position.y;
+        el.style.cursor='grabbing';
+    };
+}
+
+var rptChart=null;
+function initCharts(){
+    var cv=document.getElementById('rptChart');if(!cv)return;if(rptChart)rptChart.destroy();
+    var data=getReportData();if(data.length===0)return;
+    var ks=Object.keys(data[0]),lk=ks[0],vk=null;for(var i=0;i<ks.length;i++)if(typeof data[0][ks[i]]==='number'){vk=ks[i];break;}if(!vk)vk=ks[1]||ks[0];
+    var lbls=[],vals=[],lim=Math.min(data.length,10);for(var j=0;j<lim;j++){lbls.push(String(data[j][lk]||''));vals.push(Number(data[j][vk])||0);}
+    var cols=['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#ec4899'];
+    rptChart=new Chart(cv,{type:Store.reportConfig.chartType,data:{labels:lbls,datasets:[{label:vk,data:vals,backgroundColor:cols[0],borderColor:cols[0],borderWidth:1}]},options:{responsive:true,plugins:{legend:{labels:{color:'#e7eaed'}}},scales:{x:{ticks:{color:'#8b929a'},grid:{color:'#3d4654'}},y:{ticks:{color:'#8b929a'},grid:{color:'#3d4654'}}}}});
+}
+
+function initChat(){setTimeout(renderChatMsgs,100);}
+function renderChatMsgs(){
+    var c=document.getElementById('chatMsgs');if(!c)return;
+    var h='<div class="chat-msg bot"><div class="chat-msg-content">Hello! Describe your data model and I\'ll generate SQL.</div></div>';
+    for(var i=0;i<Chat.messages.length;i++){var m=Chat.messages[i];if(m.role==='user')h+='<div class="chat-msg user"><div class="chat-msg-content">'+esc(m.content)+'</div></div>';else{var p=parseMsg(m.content);h+='<div class="chat-msg bot">'+(p.sql?'<span class="sql-badge">SQL Generated</span>':'')+'<div class="chat-msg-content">'+esc(p.text)+'</div>'+(p.sql?'<div class="chat-msg-sql">'+esc(p.sql)+'</div>':'')+'</div>';}}
+    if(Chat.loading)h+='<div class="chat-msg bot"><div class="chat-loading"><div class="chat-dots"><span></span><span></span><span></span></div>Thinking...</div></div>';
+    c.innerHTML=h;c.scrollTop=c.scrollHeight;
+    var acts=document.getElementById('chatActs');if(acts)acts.style.display=Chat.lastSQL?'flex':'none';
+}
+
+function parseMsg(c){if(!c)return{text:'',sql:null};var m=c.match(/```sql\s*([\s\S]*?)```/i),sql=null,text=c;if(m){sql=m[1].trim();text=c.replace(/```sql\s*[\s\S]*?```/gi,'').trim();Chat.lastSQL=sql;}return{text:text,sql:sql};}
+
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
+
+function sendChat(){
+    var inp=document.getElementById('chatIn');if(!inp)return;var msg=inp.value.trim();if(!msg||Chat.loading)return;
+    if(!Chat.apiKey){var k=prompt('Enter OpenRouter API key:');if(!k)return;Chat.apiKey=k;}
+    Chat.messages.push({role:'user',content:msg});inp.value='';Chat.loading=true;renderChatMsgs();
+    var msgs=[{role:'system',content:PROMPT}];for(var i=0;i<Chat.messages.length;i++)msgs.push({role:Chat.messages[i].role,content:Chat.messages[i].content});
+    fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+Chat.apiKey},body:JSON.stringify({model:'google/gemini-2.0-flash-001',messages:msgs})})
+    .then(function(r){if(!r.ok)throw new Error('API Error: '+r.status);return r.json();})
+    .then(function(d){var a='Sorry, no response.';if(d.choices&&d.choices[0]&&d.choices[0].message)a=d.choices[0].message.content||a;Chat.messages.push({role:'assistant',content:a});Chat.loading=false;renderChatMsgs();})
+    .catch(function(e){Chat.messages.push({role:'assistant',content:'Error: '+e.message});Chat.loading=false;renderChatMsgs();});
+}
+
+function clearChat(){Chat.messages=[];Chat.lastSQL=null;renderChatMsgs();}
+function copySQL(){if(Chat.lastSQL){if(navigator.clipboard)navigator.clipboard.writeText(Chat.lastSQL).then(function(){alert('Copied!');});else prompt('Copy:',Chat.lastSQL);}}
+
+function applySQL(){
+    if(!Chat.lastSQL)return;var m=Store.currentModel;
+    try{
+        var p=parseSQL(Chat.lastSQL);if(p.tables.length===0){alert('No tables found');return;}
+        var names=[];for(var i=0;i<p.tables.length;i++)names.push(p.tables[i].name);
+        if(!confirm('Add '+p.tables.length+' table(s)?\n'+names.join(', ')))return;
+        var exists=[];for(var e=0;e<m.tables.length;e++)exists.push(m.tables[e].name.toLowerCase());
+        var x=50,y=50,added=0;
+        for(var t=0;t<p.tables.length;t++){var td=p.tables[t];if(exists.indexOf(td.name.toLowerCase())!==-1)continue;
+            var flds=[];for(var f=0;f<td.fields.length;f++){var fd=td.fields[f];flds.push({id:gid(),name:fd.name,type:mapType(fd.type),isPrimaryKey:fd.pk,isRequired:fd.req,isUnique:fd.unq});}
+            m.tables.push({id:gid(),name:td.name,isJunction:td.name.indexOf('_')!==-1,position:{x:x,y:y},fields:flds});added++;x+=220;if(x>600){x=50;y+=180;}}
+        for(var r=0;r<p.rels.length;r++){var rel=p.rels[r],ft=null,tt=null;for(var j=0;j<m.tables.length;j++){if(m.tables[j].name.toLowerCase()===rel.from.toLowerCase())ft=m.tables[j];if(m.tables[j].name.toLowerCase()===rel.to.toLowerCase())tt=m.tables[j];}
+            if(ft&&tt){var ex=false;for(var k=0;k<m.relationships.length;k++){var er=m.relationships[k];if((er.fromTable===ft.id&&er.toTable===tt.id)||(er.fromTable===tt.id&&er.toTable===ft.id)){ex=true;break;}}if(!ex)m.relationships.push({id:gid(),fromTable:ft.id,toTable:tt.id,type:'one-to-many'});}}
+        Chat.lastSQL=null;render();alert('Added '+added+' table(s)!');
+    }catch(e){alert('Parse error: '+e.message);}
+}
+
+function parseSQL(sql){
+    var tables=[],rels=[],re=/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?[`"']?(\w+)[`"']?\s*\(([\s\S]*?)\);/gi,m;
+    while((m=re.exec(sql))!==null){var tn=m[1],cols=m[2],flds=[],lines=cols.split(',');
+        for(var i=0;i<lines.length;i++){var l=lines[i].trim();if(!l)continue;if(/^\s*(PRIMARY\s+KEY|UNIQUE|CHECK|CONSTRAINT)\s*\(/i.test(l))continue;
+            if(/^\s*FOREIGN\s+KEY/i.test(l)){var fm=l.match(/FOREIGN\s+KEY\s*\([`"']?(\w+)[`"']?\)\s*REFERENCES\s+[`"']?(\w+)[`"']?/i);if(fm)rels.push({from:fm[2],to:tn});continue;}
+            var cm=l.match(/^[`"']?(\w+)[`"']?\s+(\w+(?:\s*\([^)]+\))?)/i);if(cm){var fn=cm[1],ft=cm[2],pk=/PRIMARY\s+KEY/i.test(l),req=/NOT\s+NULL/i.test(l)||pk,unq=/UNIQUE/i.test(l)||pk;
+                var rm=l.match(/REFERENCES\s+[`"']?(\w+)[`"']?/i);if(rm)rels.push({from:rm[1],to:tn});
+                flds.push({name:fmtField(fn),type:ft,pk:pk,req:req,unq:unq});}}
+        if(flds.length>0)tables.push({name:fmtTable(tn),fields:flds});}
+    return{tables:tables,rels:rels};
+}
+
+function fmtTable(n){var p=n.split('_'),r=[];for(var i=0;i<p.length;i++)r.push(p[i].charAt(0).toUpperCase()+p[i].slice(1).toLowerCase());return r.join('_');}
+function fmtField(n){var p=n.split('_'),r=[];for(var i=0;i<p.length;i++)r.push(p[i].charAt(0).toUpperCase()+p[i].slice(1).toLowerCase());return r.join(' ');}
+function mapType(t){var u=t.toUpperCase();if(u.indexOf('INT')!==-1)return'Number';if(u.indexOf('FLOAT')!==-1||u.indexOf('DECIMAL')!==-1||u.indexOf('DOUBLE')!==-1)return'Decimal';if(u.indexOf('TEXT')!==-1)return'Long Text';if(u.indexOf('DATE')!==-1||u.indexOf('TIME')!==-1)return'Date';if(u.indexOf('BOOL')!==-1)return'Boolean';return'Text';}
+
+function nav(s){Store.currentScreen=s;if(s==='entry'){Store.entryMode=null;Store.selectedTables=[];}render();}
+function createModel(){var n=prompt('Model name:');if(!n)return;var m={id:gid(),name:n,description:'',tables:[],relationships:[]};Store.dataModels.push(m);openModel(m.id);}
+function openModel(id){for(var i=0;i<Store.dataModels.length;i++)if(Store.dataModels[i].id===id){Store.currentModel=Store.dataModels[i];break;}Store.selectedTable=null;Store.currentScreen='designer';render();}
+function selectTable(id){var m=Store.currentModel;for(var i=0;i<m.tables.length;i++)if(m.tables[i].id===id){Store.selectedTable=m.tables[i];break;}render();}
+function switchTab(t){var tabs=document.querySelectorAll('.panel-tab');for(var i=0;i<tabs.length;i++){tabs[i].classList.remove('active');if(tabs[i].getAttribute('data-tab')===t)tabs[i].classList.add('active');}var c=document.getElementById('panelContent');c.innerHTML=t==='fields'?(Store.selectedTable?renderFields(Store.selectedTable):'<div class="empty"><p>Select table</p></div>'):renderRels();}
+
+function showAddTable(){var md=document.getElementById('modal');md.innerHTML='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><span class="modal-title">Add Table</span><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Name</label><input class="form-input" id="ntName"></div><label class="form-check"><input type="checkbox" id="ntJunc"><span>Junction table</span></label></div><div class="modal-footer"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="addTable()">Create</button></div></div></div>';}
+function addTable(){var n=document.getElementById('ntName').value.trim(),j=document.getElementById('ntJunc').checked;if(!n){alert('Enter name');return;}Store.currentModel.tables.push({id:gid(),name:n,isJunction:j,position:{x:50+Math.random()*200,y:50+Math.random()*200},fields:[{id:gid(),name:n+' ID',type:'Number',isPrimaryKey:true,isRequired:true,isUnique:true}]});closeModal();render();}
+function updTableName(id,n){for(var i=0;i<Store.currentModel.tables.length;i++)if(Store.currentModel.tables[i].id===id)Store.currentModel.tables[i].name=n;render();}
+function toggleJunc(id,v){for(var i=0;i<Store.currentModel.tables.length;i++)if(Store.currentModel.tables[i].id===id)Store.currentModel.tables[i].isJunction=v;render();}
+function delTable(id){if(!confirm('Delete table?'))return;Store.currentModel.tables=Store.currentModel.tables.filter(function(t){return t.id!==id});Store.currentModel.relationships=Store.currentModel.relationships.filter(function(r){return r.fromTable!==id&&r.toTable!==id});Store.selectedTable=null;render();}
+
+function showAddField(tid){var md=document.getElementById('modal');md.innerHTML='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><span class="modal-title">Add Field</span><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Name</label><input class="form-input" id="nfName"></div><div class="form-group"><label class="form-label">Type</label><select class="form-select" id="nfType"><option>Text</option><option>Long Text</option><option>Number</option><option>Decimal</option><option>Email</option><option>Password</option><option>Date</option><option>Boolean</option></select></div><label class="form-check" style="margin-bottom:12px"><input type="checkbox" id="nfReq"><span>Required</span></label><label class="form-check"><input type="checkbox" id="nfUnq"><span>Unique</span></label></div><div class="modal-footer"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="addField(\''+tid+'\')">Add</button></div></div></div>';}
+function addField(tid){var n=document.getElementById('nfName').value.trim(),t=document.getElementById('nfType').value,rq=document.getElementById('nfReq').checked,uq=document.getElementById('nfUnq').checked;if(!n){alert('Enter name');return;}for(var i=0;i<Store.currentModel.tables.length;i++)if(Store.currentModel.tables[i].id===tid){Store.currentModel.tables[i].fields.push({id:gid(),name:n,type:t,isPrimaryKey:false,isRequired:rq,isUnique:uq});break;}closeModal();render();}
+
+function showEditField(tid,fid){var t=null,f=null;for(var i=0;i<Store.currentModel.tables.length;i++)if(Store.currentModel.tables[i].id===tid){t=Store.currentModel.tables[i];for(var j=0;j<t.fields.length;j++)if(t.fields[j].id===fid){f=t.fields[j];break;}break;}if(!f)return;
+    var md=document.getElementById('modal'),rc=f.isRequired?' checked':'',uc=f.isUnique?' checked':'';
+    var opts='';var types=['Text','Long Text','Number','Decimal','Email','Password','Date','Boolean'];for(var k=0;k<types.length;k++)opts+='<option'+(f.type===types[k]?' selected':'')+'>'+types[k]+'</option>';
+    md.innerHTML='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><span class="modal-title">Edit Field</span><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="form-group"><label class="form-label">Name</label><input class="form-input" id="efName" value="'+f.name+'"></div><div class="form-group"><label class="form-label">Type</label><select class="form-select" id="efType">'+opts+'</select></div><label class="form-check" style="margin-bottom:12px"><input type="checkbox" id="efReq"'+rc+'><span>Required</span></label><label class="form-check"><input type="checkbox" id="efUnq"'+uc+'><span>Unique</span></label></div><div class="modal-footer"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="updField(\''+tid+'\',\''+fid+'\')">Save</button></div></div></div>';}
+function updField(tid,fid){var n=document.getElementById('efName').value.trim(),t=document.getElementById('efType').value,rq=document.getElementById('efReq').checked,uq=document.getElementById('efUnq').checked;for(var i=0;i<Store.currentModel.tables.length;i++)if(Store.currentModel.tables[i].id===tid){for(var j=0;j<Store.currentModel.tables[i].fields.length;j++)if(Store.currentModel.tables[i].fields[j].id===fid){Store.currentModel.tables[i].fields[j].name=n;Store.currentModel.tables[i].fields[j].type=t;Store.currentModel.tables[i].fields[j].isRequired=rq;Store.currentModel.tables[i].fields[j].isUnique=uq;break;}break;}closeModal();render();}
+function delField(tid,fid){if(!confirm('Delete field?'))return;for(var i=0;i<Store.currentModel.tables.length;i++)if(Store.currentModel.tables[i].id===tid){Store.currentModel.tables[i].fields=Store.currentModel.tables[i].fields.filter(function(f){return f.id!==fid});break;}render();}
+
+function showAddRel(){var m=Store.currentModel,opts='<option value="">Select...</option>';for(var i=0;i<m.tables.length;i++)opts+='<option value="'+m.tables[i].id+'">'+m.tables[i].name+'</option>';
+    var md=document.getElementById('modal');md.innerHTML='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><span class="modal-title">Add Relationship</span><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body"><div class="form-group"><label class="form-label">From</label><select class="form-select" id="relFrom">'+opts+'</select></div><div class="form-group"><label class="form-label">Type</label><select class="form-select" id="relType"><option value="one-to-one">One to One</option><option value="one-to-many">One to Many</option><option value="many-to-many">Many to Many</option></select></div><div class="form-group"><label class="form-label">To</label><select class="form-select" id="relTo">'+opts+'</select></div></div><div class="modal-footer"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="addRel()">Create</button></div></div></div>';}
+function addRel(){var f=document.getElementById('relFrom').value,t=document.getElementById('relTo').value,tp=document.getElementById('relType').value;if(!f||!t){alert('Select both');return;}if(f===t){alert('Cannot relate to self');return;}var m=Store.currentModel;for(var i=0;i<m.relationships.length;i++){var r=m.relationships[i];if((r.fromTable===f&&r.toTable===t)||(r.fromTable===t&&r.toTable===f)){alert('Exists');return;}}
+    if(tp==='many-to-many'){var ft=m.tables.find(function(x){return x.id===f}),tt=m.tables.find(function(x){return x.id===t}),jn=ft.name+'_'+tt.name;m.tables.push({id:gid(),name:jn,isJunction:true,position:{x:(ft.position.x+tt.position.x)/2,y:(ft.position.y+tt.position.y)/2+100},fields:[{id:gid(),name:jn+' ID',type:'Number',isPrimaryKey:true,isRequired:true,isUnique:true}]});var jt=m.tables[m.tables.length-1];m.relationships.push({id:gid(),fromTable:f,toTable:jt.id,type:'one-to-many'});m.relationships.push({id:gid(),fromTable:t,toTable:jt.id,type:'one-to-many'});}else{m.relationships.push({id:gid(),fromTable:f,toTable:t,type:tp});}closeModal();render();}
+function delRel(id){if(!confirm('Delete?'))return;Store.currentModel.relationships=Store.currentModel.relationships.filter(function(r){return r.id!==id});render();}
+
+function showSQL(){var sql=genSQL(Store.currentModel),md=document.getElementById('modal');md.innerHTML='<div class="modal-overlay" onclick="closeModal(event)"><div class="modal" style="max-width:700px" onclick="event.stopPropagation()"><div class="modal-header"><span class="modal-title">SQL Schema</span><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body"><pre class="sql-preview">'+esc(sql)+'</pre></div><div class="modal-footer"><button class="btn btn-s" onclick="copySQLModal()">Copy</button><button class="btn btn-p" onclick="downloadSQL()">Download</button></div></div></div>';}
+function copySQLModal(){var sql=genSQL(Store.currentModel);if(navigator.clipboard)navigator.clipboard.writeText(sql).then(function(){alert('Copied!');});else prompt('Copy:',sql);}
+function downloadSQL(){var sql=genSQL(Store.currentModel),blob=new Blob([sql],{type:'text/plain'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=Store.currentModel.name.replace(/\s+/g,'_').toLowerCase()+'.sql';a.click();URL.revokeObjectURL(url);}
+
+function closeModal(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('modal').innerHTML='';}
+
+function selMode(m){Store.entryMode=m;Store.selectedTables=[];render();}
+function toggleTblSel(id){var idx=Store.selectedTables.indexOf(id);if(idx>=0)Store.selectedTables.splice(idx,1);else Store.selectedTables.push(id);render();}
+function startEntry(){if(Store.entryMode==='flow'){Store.selectedTables=[];for(var i=0;i<Store.currentModel.tables.length;i++)Store.selectedTables.push(Store.currentModel.tables[i].id);}if(Store.selectedTables.length===0){alert('Select tables');return;}Store.currentScreen='entry-form';render();}
+function addRepRow(tid){var c=document.getElementById('rep-'+tid),t=Store.currentModel.tables.find(function(x){return x.id===tid}),n=c.querySelectorAll('.repeat-section').length,d=document.createElement('div');d.innerHTML=renderRepRow(t,n);c.appendChild(d.firstElementChild);}
+function remRepRow(tid,i){var c=document.getElementById('rep-'+tid),r=c.querySelector('[data-ri="'+i+'"]');if(r)r.remove();}
+
+function submitEntry(e){
+    e.preventDefault();var form=e.target,fd=new FormData(form),m=Store.currentModel,tables=getEntryTables(),steps=[];
+    for(var t=0;t<tables.length;t++){var tbl=tables[t],rep=isRepeat(tbl.id);if(!Store.enteredData[tbl.id])Store.enteredData[tbl.id]=[];
+        if(rep){var c=document.getElementById('rep-'+tbl.id),rows=c?c.querySelectorAll('.repeat-section'):[];for(var r=0;r<rows.length;r++){var rec={},pk=tbl.fields.find(function(x){return x.isPrimaryKey});if(pk)rec[pk.name]=gnid();for(var f=0;f<tbl.fields.length;f++){var fld=tbl.fields[f];if(fld.isPrimaryKey)continue;var k=tbl.id+'_'+r+'_'+fld.id,v=fd.get(k);if(fld.type==='Number')v=parseInt(v)||0;else if(fld.type==='Decimal')v=parseFloat(v)||0;else if(fld.type==='Boolean')v=v==='true';rec[fld.name]=v;}Store.enteredData[tbl.id].push(rec);steps.push({table:tbl.name,data:rec});}}
+        else{var rec={},pk=tbl.fields.find(function(x){return x.isPrimaryKey});if(pk)rec[pk.name]=gnid();for(var f=0;f<tbl.fields.length;f++){var fld=tbl.fields[f];if(fld.isPrimaryKey)continue;var k=tbl.id+'_'+fld.id,v=fd.get(k);if(fld.type==='Number')v=parseInt(v)||0;else if(fld.type==='Decimal')v=parseFloat(v)||0;else if(fld.type==='Boolean')v=v==='true';rec[fld.name]=v;}Store.enteredData[tbl.id].push(rec);steps.push({table:tbl.name,data:rec});}}
+    showFlowViz(steps);
+}
+
+function showFlowViz(steps){
+    var h='<div class="flow-viz"><h3 style="margin-bottom:20px">Data Flow</h3><div class="alert alert-success">'+steps.length+' record(s) created!</div>';
+    for(var i=0;i<steps.length;i++){h+='<div class="flow-step"><div class="flow-num">'+(i+1)+'</div><div class="flow-content"><div class="flow-title">'+steps[i].table+'</div><div class="flow-data">'+JSON.stringify(steps[i].data,null,2)+'</div></div></div>';if(i<steps.length-1)h+='<div class="flow-arrow">↓</div>';}
+    h+='<div style="margin-top:24px;display:flex;gap:12px"><button class="btn btn-p" onclick="resetEntry()">Enter More</button><button class="btn btn-s" onclick="nav(\'reports\')">Reports</button></div></div>';
+    document.getElementById('flowViz').innerHTML=h;
+}
+function resetEntry(){Store.currentScreen='entry';Store.entryMode=null;Store.selectedTables=[];render();}
+function toggleRptField(tid,fid){var k=tid+'.'+fid,idx=Store.reportConfig.selectedFields.indexOf(k);if(idx>=0)Store.reportConfig.selectedFields.splice(idx,1);else Store.reportConfig.selectedFields.push(k);render();}
+
+function init(){var demo=createDemo();Store.dataModels.push(demo);Store.currentModel=demo;createDemoData();render();}
+init();
+</script>
 </body>
 </html>
+
